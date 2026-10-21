@@ -87,7 +87,7 @@ export interface PruebaFicha {
 export interface Ficha {
   id: string;
   nombreCompleto: string;
-  oposicion: { id: string; nombre: string; fecha_examen: string | null };
+  oposicion: { id: string; nombre: string; fecha_examen: string | null; baremo_fuente: string | null };
   grupo: string | null;
   cuota_al_dia: boolean;
   codigo_acceso: string;
@@ -100,7 +100,7 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
   const supabase = await createClient();
   const { data: a } = await supabase
     .from("alumnos")
-    .select("id, nombre, apellidos, sexo, fecha_nacimiento, cuota_al_dia, codigo_acceso, perfil_id, oposiciones(id, nombre, fecha_examen), grupos(nombre)")
+    .select("id, nombre, apellidos, sexo, fecha_nacimiento, cuota_al_dia, codigo_acceso, perfil_id, oposiciones(id, nombre, fecha_examen, baremo_fuente), grupos(nombre)")
     .eq("id", alumnoId)
     .maybeSingle();
   if (!a) return null;
@@ -110,8 +110,10 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
   const [{ data: pruebas }, { data: resultados }] = await Promise.all([
     supabase
       .from("pruebas")
-      .select("id, nombre, tipo, unidad, mayor_es_mejor, baremos(sexo, edad_min, edad_max, marca_minima, marca_objetivo)")
+      .select("id, nombre, tipo, unidad, mayor_es_mejor, sexo, baremos(sexo, edad_min, edad_max, marca_minima, marca_objetivo, puntos)")
       .eq("oposicion_id", oposicion.id)
+      // Pruebas comunes y las del sexo del alumno (dominadas en hombres, suspensión en mujeres)
+      .or(`sexo.is.null,sexo.eq.${alumno.sexo}`)
       .order("orden"),
     supabase.from("resultados").select("prueba_id, fecha, marca").eq("alumno_id", alumnoId).order("fecha"),
   ]);
@@ -136,7 +138,13 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
         tipo: p.tipo,
         unidad: p.unidad,
         baremo: fila
-          ? { unidad: p.unidad as Unidad, mayorEsMejor: p.mayor_es_mejor, minima: Number(fila.marca_minima), objetivo: fila.marca_objetivo === null ? null : Number(fila.marca_objetivo) }
+          ? {
+              unidad: p.unidad as Unidad,
+              mayorEsMejor: p.mayor_es_mejor,
+              minima: Number(fila.marca_minima),
+              objetivo: fila.marca_objetivo === null ? null : Number(fila.marca_objetivo),
+              puntos: fila.puntos?.map(Number) ?? null,
+            }
           : null,
         serie: (resultados ?? []).filter((r) => r.prueba_id === p.id).map((r) => ({ fecha: r.fecha, marca: Number(r.marca) })),
       };

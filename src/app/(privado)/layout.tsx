@@ -6,7 +6,7 @@ import { salir } from "@/app/login/actions";
 export const instant = false;
 
 const MENU: Record<Rol, [string, string][]> = {
-  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/acceso", "Acceso"], ["/cuotas", "Cuotas"], ["/personal", "Personal"]],
+  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/acceso", "Acceso"], ["/cuotas", "Cuotas"], ["/oposiciones", "Oposiciones"], ["/personal", "Personal"]],
   preparador: [["/alumnos", "Mis alumnos"], ["/registrar", "Registrar marca"]],
   alumno: [["/mi", "Mi evolución"]],
   recepcion: [["/acceso", "Acceso"]],
