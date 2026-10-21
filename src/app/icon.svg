@@ -1,13 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240">
-  <rect width="240" height="240" rx="44" fill="#1f3b57"/>
+  <rect width="240" height="240" rx="44" fill="#0b0b0b"/>
   <g transform="translate(0,26)" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round">
-    <path d="M60,55 L150,145 L143,152 L53,62 Z" fill="#1f3b57"/>
-    <path transform="translate(57,52) rotate(-45)" d="M-6,-8 L8,-8 L8,6 L-6,6 L-20,15 Q-27,-1 -20,-17 Z M8,-5 L22,-1 L8,3 Z" fill="#e8b100"/>
-    <path d="M180,55 L90,145 L97,152 L187,62 Z" fill="#1f3b57"/>
-    <path transform="translate(183,52) rotate(45)" d="M-20,-8 L18,-8 L24,-3 L18,4 L-20,4 Z" fill="#e8b100"/>
-    <path d="M88,58 Q86,22 120,18 Q154,22 152,58 Z" fill="#e8b100"/>
-    <path d="M70,60 Q120,50 170,60 L170,68 Q120,58 70,68 Z" fill="#1f3b57"/>
-    <path d="M72,74 L124,74 L124,94 L116,94 L116,86 L96,86 L96,108 L110,108 L110,120 L96,120 L96,146 L104,146 L104,158 L72,158 L72,146 L80,146 L80,86 L72,86 Z" fill="#1f3b57"/>
-    <path d="M114,74 L180,74 L180,96 L172,96 L172,87 L155,87 L155,146 L164,146 L164,158 L130,158 L130,146 L139,146 L139,87 L122,87 L122,96 L114,96 Z" fill="#e8b100"/>
+    <path d="M60,55 L150,145 L143,152 L53,62 Z" fill="#0b0b0b"/>
+    <path transform="translate(57,52) rotate(-45)" d="M-6,-8 L8,-8 L8,6 L-6,6 L-20,15 Q-27,-1 -20,-17 Z M8,-5 L22,-1 L8,3 Z" fill="#ff4d1a"/>
+    <path d="M180,55 L90,145 L97,152 L187,62 Z" fill="#0b0b0b"/>
+    <path transform="translate(183,52) rotate(45)" d="M-20,-8 L18,-8 L24,-3 L18,4 L-20,4 Z" fill="#ff4d1a"/>
+    <path d="M88,58 Q86,22 120,18 Q154,22 152,58 Z" fill="#ff4d1a"/>
+    <path d="M70,60 Q120,50 170,60 L170,68 Q120,58 70,68 Z" fill="#0b0b0b"/>
+    <path d="M72,74 L124,74 L124,94 L116,94 L116,86 L96,86 L96,108 L110,108 L110,120 L96,120 L96,146 L104,146 L104,158 L72,158 L72,146 L80,146 L80,86 L72,86 Z" fill="#0b0b0b"/>
+    <path d="M114,74 L180,74 L180,96 L172,96 L172,87 L155,87 L155,146 L164,146 L164,158 L130,158 L130,146 L139,146 L139,87 L122,87 L122,96 L114,96 Z" fill="#ff4d1a"/>
   </g>
 </svg>

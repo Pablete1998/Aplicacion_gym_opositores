@@ -11,6 +11,7 @@ export default function Login() {
       <section className="panel login">
         <Logo conNombre className="logo-grande" />
         <h1 className="visually-hidden">Fer&apos;s Team</h1>
+        <p className="lema">Sin excusas</p>
         <p className="sub" style={{ textAlign: "center" }}>Entra con el correo que te dio la academia.</p>
         <form action={accion} style={{ display: "grid", gap: 12 }}>
           <label>
