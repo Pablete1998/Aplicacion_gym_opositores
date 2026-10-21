@@ -30,7 +30,8 @@ export default async function Personal() {
     const hasta = cuentas.get(id)?.banned_until;
     return Boolean(hasta && new Date(hasta) > new Date());
   };
-  const preparadores = (perfiles ?? []).filter((p) => p.rol === "preparador");
+  // Dirección también puede llevar grupos como preparador
+  const preparadores = (perfiles ?? []).filter((p) => p.rol === "preparador" || p.rol === "direccion");
   const alumnosSinAcceso = (alumnos ?? []).filter((a) => !a.perfil_id).map((a) => ({ id: a.id, nombre: `${a.apellidos}, ${a.nombre}` }));
 
   return (
@@ -93,7 +94,7 @@ export default async function Personal() {
 
       <section className="panel">
         <h2>Preparador de cada grupo</h2>
-        <p className="sub">Cada preparador solo ve y registra marcas de los alumnos de sus grupos.</p>
+        <p className="sub">Cada preparador solo ve y registra marcas de los alumnos de sus grupos. Dirección también puede llevar grupos y sigue viéndolo todo.</p>
         <div className="tbl">
           <table>
             <thead><tr><th>Grupo</th><th>Preparador</th></tr></thead>
@@ -106,7 +107,7 @@ export default async function Personal() {
                       <input type="hidden" name="grupo_id" value={g.id} />
                       <select name="preparador_id" defaultValue={g.preparador_id ?? ""} aria-label={`Preparador de ${g.nombre}`}>
                         <option value="">Sin preparador</option>
-                        {preparadores.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+                        {preparadores.map((p) => <option key={p.id} value={p.id}>{p.nombre}{p.rol === "direccion" && " (Dirección)"}</option>)}
                       </select>
                       <button className="btn ghost">Guardar</button>
                     </form>
