@@ -6,5 +6,5 @@ export const instant = false;
 
 export default async function Inicio() {
   const perfil = await perfilActual();
-  redirect(INICIO[perfil.rol]);
+  redirect(perfil.cambiar_password ? "/cuenta" : INICIO[perfil.rol]);
 }

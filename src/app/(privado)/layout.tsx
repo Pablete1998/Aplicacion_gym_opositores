@@ -6,7 +6,7 @@ import { salir } from "@/app/login/actions";
 export const instant = false;
 
 const MENU: Record<Rol, [string, string][]> = {
-  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/acceso", "Acceso"]],
+  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/acceso", "Acceso"], ["/personal", "Personal"]],
   preparador: [["/alumnos", "Mis alumnos"], ["/registrar", "Registrar marca"]],
   alumno: [["/mi", "Mi evolución"]],
   recepcion: [["/acceso", "Acceso"]],
@@ -30,14 +30,21 @@ export default async function LayoutPrivado({ children }: { children: React.Reac
             ))}
           </nav>
           <div className="usuario">
-            <span>{perfil.nombre}</span>
+            <Link href="/cuenta">{perfil.nombre}</Link>
             <form action={salir}>
               <button className="btn ghost">Salir</button>
             </form>
           </div>
         </div>
       </header>
-      <main className="wrap">{children}</main>
+      <main className="wrap">
+        {perfil.cambiar_password && (
+          <p className="aviso error">
+            Estás usando una contraseña provisional. <Link href="/cuenta">Cámbiala ahora</Link>.
+          </p>
+        )}
+        {children}
+      </main>
     </>
   );
 }
