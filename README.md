@@ -12,6 +12,8 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | `/alumnos/nuevo`, `/alumnos/[id]/editar` | Dirección | Alta y edición de alumnos (cuota, grupo, baja) |
 | `/alumnos/[id]` | Dirección, preparadores | Ficha: situación frente al baremo, gráfica de evolución e historial |
 | `/registrar` | Dirección, preparadores | Registrar una marca (acepta `11,4`, `8` o `3:45`) |
+| `/personal` | Dirección | Dar acceso (contraseña provisional), cambiar rol, quitar acceso y asignar preparadores a grupos |
+| `/cuenta` | Todos | Cambiar la contraseña (obligatorio tras una provisional) |
 | `/acceso` | Recepción, dirección | Lector de QR: registra la entrada y la deniega si la cuota está pendiente |
 | `/mi` | Alumno | Su evolución y su QR de acceso |
 
@@ -24,11 +26,12 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta `supabase/migrations/0001_esquema.sql` y después `supabase/seed.sql`.
-3. Copia `.env.example` a `.env.local` y rellena la URL y la clave pública del proyecto.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql` y `supabase/migrations/0002_personal.sql`.
+3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
+   La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.
-5. Crea los usuarios en Supabase (Authentication → Users). Cada usuario nuevo empieza con rol `alumno`;
-   cambia el rol en la tabla `perfiles` y vincula a los alumnos con `alumnos.perfil_id`.
+5. Crea el primer usuario de dirección en Supabase (Authentication → Users) y ponle `rol = 'direccion'` en `perfiles`.
+   El resto de accesos se crean desde la página Personal de la app.
 
 > Los baremos de `seed.sql` son **orientativos**. Antes de usar la app con alumnos hay que cargar los oficiales de cada convocatoria.
 
@@ -42,7 +45,7 @@ npm run build
 
 ## Pendiente
 
-- Formularios de grupos y oposiciones, y cuentas de acceso para alumnos y preparadores (hoy desde Supabase).
+- Formularios de grupos y oposiciones (hoy desde Supabase).
 - Avisos a grupos (la tabla y los permisos ya existen).
 - Lectura del QR con la cámara de la tablet (hoy funciona con lector USB/Bluetooth o pegando el código).
 - Tipos generados con `supabase gen types` en lugar del ayudante `uno()`.

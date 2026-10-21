@@ -8,6 +8,7 @@ export interface Perfil {
   id: string;
   nombre: string;
   rol: Rol;
+  cambiar_password: boolean;
 }
 
 // Sin tipos generados de la base de datos, las relaciones a uno llegan tipadas como lista.
@@ -15,6 +16,13 @@ export interface Perfil {
 export function uno<T>(x: T | T[] | null | undefined): T | null {
   return Array.isArray(x) ? (x[0] ?? null) : (x ?? null);
 }
+
+export const ROLES: Record<Rol, string> = {
+  direccion: "Dirección",
+  preparador: "Preparador",
+  alumno: "Alumno",
+  recepcion: "Recepción",
+};
 
 export const INICIO: Record<Rol, string> = {
   direccion: "/alumnos",
@@ -27,9 +35,10 @@ export async function perfilActual(): Promise<Perfil> {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getClaims();
   if (!auth?.claims) redirect("/login");
-  const { data } = await supabase.from("perfiles").select("id, nombre, rol").eq("id", auth.claims.sub).single();
+  // select("*") para no romper el acceso si aún no se ha aplicado la migración 0002
+  const { data } = await supabase.from("perfiles").select("*").eq("id", auth.claims.sub).single();
   if (!data) redirect("/login");
-  return data as Perfil;
+  return { id: data.id, nombre: data.nombre, rol: data.rol, cambiar_password: data.cambiar_password === true };
 }
 
 // Corta el paso a quien no tenga uno de los roles indicados
