@@ -77,3 +77,4 @@ input, select, textarea { font: inherit; color: var(--ink); background: var(--bg
 .resultado .grande { font-family: var(--f-display), sans-serif; font-size: 40px; font-weight: 700; line-height: 1; }
 .qr { width: 200px; height: 200px; background: #fff; padding: 8px; border-radius: 8px; }
 .login { max-width: 380px; margin: 10vh auto; }
+.camara { width: 100%; max-height: 360px; object-fit: cover; border-radius: 8px; background: #000; }
