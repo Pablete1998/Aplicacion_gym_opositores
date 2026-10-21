@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { crearAcceso, restablecerPassword, type Credenciales } from "./actions";
 
@@ -30,7 +31,13 @@ export function NuevaPersona({ alumnosSinAcceso }: { alumnosSinAcceso: { id: str
           <option value="direccion">Dirección (administrador)</option>
         </select>
       </label>
-      {rol === "alumno" && (
+      {rol === "alumno" && alumnosSinAcceso.length === 0 && (
+        <p className="aviso error" style={{ gridColumn: "1 / -1" }}>
+          No hay fichas de alumno sin acceso. Primero <Link href="/alumnos/nuevo">da de alta al alumno</Link> y luego vuelve aquí,
+          o pulsa &quot;Dar acceso&quot; en su ficha.
+        </p>
+      )}
+      {rol === "alumno" && alumnosSinAcceso.length > 0 && (
         <label>
           Ficha del alumno
           <select id="alumno_id" name="alumno_id" required>
@@ -59,6 +66,25 @@ export function Restablecer({ id }: { id: string }) {
   return (
     <form action={enviar}>
       <button className="btn ghost" disabled={enviando}>{estado && !estado.ok ? "Error, reintentar" : "Nueva contraseña"}</button>
+    </form>
+  );
+}
+
+// Desde la ficha: el alumno ya está elegido, solo falta el correo
+export function AccesoAlumno({ alumnoId, nombre }: { alumnoId: string; nombre: string }) {
+  const [estado, enviar, creando] = useActionState(crearAcceso, null);
+  if (estado?.ok) return <MostrarCredenciales estado={estado} />;
+  return (
+    <form action={enviar} className="campos">
+      <input type="hidden" name="rol" value="alumno" />
+      <input type="hidden" name="alumno_id" value={alumnoId} />
+      <input type="hidden" name="nombre" value={nombre} />
+      <label>
+        Correo del alumno
+        <input id="email" name="email" type="email" required autoComplete="off" />
+      </label>
+      <button className="btn" disabled={creando}>{creando ? "Creando…" : "Dar acceso"}</button>
+      <MostrarCredenciales estado={estado} />
     </form>
   );
 }
