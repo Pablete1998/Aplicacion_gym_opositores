@@ -9,6 +9,7 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | --- | --- | --- |
 | `/login` | Todos | Entrada con correo y contraseña |
 | `/alumnos` | Dirección, preparadores | Lista de alumnos (cada preparador ve solo sus grupos) |
+| `/alumnos/nuevo`, `/alumnos/[id]/editar` | Dirección | Alta y edición de alumnos (cuota, grupo, baja) |
 | `/alumnos/[id]` | Dirección, preparadores | Ficha: situación frente al baremo, gráfica de evolución e historial |
 | `/registrar` | Dirección, preparadores | Registrar una marca (acepta `11,4`, `8` o `3:45`) |
 | `/acceso` | Recepción, dirección | Lector de QR: registra la entrada y la deniega si la cuota está pendiente |
@@ -41,7 +42,7 @@ npm run build
 
 ## Pendiente
 
-- Formularios de alta de alumnos, grupos y oposiciones (hoy se hace desde Supabase).
+- Formularios de grupos y oposiciones, y cuentas de acceso para alumnos y preparadores (hoy desde Supabase).
 - Avisos a grupos (la tabla y los permisos ya existen).
 - Lectura del QR con la cámara de la tablet (hoy funciona con lector USB/Bluetooth o pegando el código).
 - Tipos generados con `supabase gen types` en lugar del ayudante `uno()`.

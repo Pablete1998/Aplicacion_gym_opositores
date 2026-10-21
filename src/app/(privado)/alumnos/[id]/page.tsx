@@ -4,7 +4,7 @@ import { Ficha } from "@/components/Ficha";
 import { cargarFicha, exigirRol } from "@/lib/datos";
 
 export default async function FichaAlumno({ params, searchParams }: PageProps<"/alumnos/[id]">) {
-  await exigirRol("direccion", "preparador");
+  const perfil = await exigirRol("direccion", "preparador");
   const { id } = await params;
   const { prueba } = await searchParams;
   const ficha = await cargarFicha(id);
@@ -13,7 +13,10 @@ export default async function FichaAlumno({ params, searchParams }: PageProps<"/
     <>
       <div className="row">
         <Link href="/alumnos" className="sub">← Alumnos</Link>
-        <Link href={`/registrar?alumno=${id}`} className="btn">Registrar marca</Link>
+        <div className="row" style={{ justifyContent: "flex-end" }}>
+          {perfil.rol === "direccion" && <Link href={`/alumnos/${id}/editar`} className="btn ghost">Editar</Link>}
+          <Link href={`/registrar?alumno=${id}`} className="btn">Registrar marca</Link>
+        </div>
       </div>
       <Ficha ficha={ficha} pruebaId={typeof prueba === "string" ? prueba : undefined} base={`/alumnos/${id}`} />
     </>

@@ -6,9 +6,12 @@ export default async function Alumnos() {
   const alumnos = await listarAlumnos();
   return (
     <>
-      <div>
-        <h1>{perfil.rol === "preparador" ? "Mis alumnos" : "Alumnos"}</h1>
-        <p className="sub">{alumnos.length} alumnos activos. Pulsa uno para ver su ficha y evolución.</p>
+      <div className="row">
+        <div>
+          <h1>{perfil.rol === "preparador" ? "Mis alumnos" : "Alumnos"}</h1>
+          <p className="sub">{alumnos.length} alumnos activos. Pulsa uno para ver su ficha y evolución.</p>
+        </div>
+        {perfil.rol === "direccion" && <Link href="/alumnos/nuevo" className="btn">Dar de alta alumno</Link>}
       </div>
       <section className="panel">
         <div className="tbl">
@@ -31,7 +34,7 @@ export default async function Alumnos() {
                 </tr>
               ))}
               {alumnos.length === 0 && (
-                <tr><td colSpan={4}>No hay alumnos todavía. Dirección los da de alta desde Supabase mientras no exista el formulario de alta.</td></tr>
+                <tr><td colSpan={4}>No hay alumnos todavía.</td></tr>
               )}
             </tbody>
           </table>
