@@ -91,6 +91,7 @@ export interface Ficha {
   grupo: string | null;
   cuota_al_dia: boolean;
   codigo_acceso: string;
+  tieneAcceso: boolean;
   diasHastaExamen: number | null;
   pruebas: PruebaFicha[];
 }
@@ -99,7 +100,7 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
   const supabase = await createClient();
   const { data: a } = await supabase
     .from("alumnos")
-    .select("id, nombre, apellidos, sexo, fecha_nacimiento, cuota_al_dia, codigo_acceso, oposiciones(id, nombre, fecha_examen), grupos(nombre)")
+    .select("id, nombre, apellidos, sexo, fecha_nacimiento, cuota_al_dia, codigo_acceso, perfil_id, oposiciones(id, nombre, fecha_examen), grupos(nombre)")
     .eq("id", alumnoId)
     .maybeSingle();
   if (!a) return null;
@@ -123,6 +124,7 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
     grupo: uno(alumno.grupos)?.nombre ?? null,
     cuota_al_dia: alumno.cuota_al_dia,
     codigo_acceso: alumno.codigo_acceso,
+    tieneAcceso: Boolean(alumno.perfil_id),
     diasHastaExamen: oposicion.fecha_examen
       ? Math.round((new Date(oposicion.fecha_examen).getTime() - Date.now()) / 864e5)
       : null,
