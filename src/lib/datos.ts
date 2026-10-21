@@ -57,13 +57,15 @@ export interface AlumnoResumen {
   grupo: string | null;
 }
 
-export async function listarAlumnos(): Promise<AlumnoResumen[]> {
+// Con preparadorId, solo los alumnos de los grupos que lleva esa persona
+export async function listarAlumnos(preparadorId?: string): Promise<AlumnoResumen[]> {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  let consulta = supabase
     .from("alumnos")
-    .select("id, nombre, apellidos, cuota_al_dia, oposiciones(nombre), grupos(nombre)")
-    .eq("activo", true)
-    .order("apellidos");
+    .select(`id, nombre, apellidos, cuota_al_dia, oposiciones(nombre), grupos${preparadorId ? "!inner" : ""}(nombre)`)
+    .eq("activo", true);
+  if (preparadorId) consulta = consulta.eq("grupos.preparador_id", preparadorId);
+  const { data, error } = await consulta.order("apellidos");
   if (error) throw error;
   return (data ?? []).map((a) => ({
     id: a.id,
@@ -156,4 +158,10 @@ export async function miAlumnoId(): Promise<string | null> {
   const supabase = await createClient();
   const { data } = await supabase.rpc("mi_alumno");
   return (data as string | null) ?? null;
+}
+
+export async function llevaGrupos(perfilId: string): Promise<boolean> {
+  const supabase = await createClient();
+  const { count } = await supabase.from("grupos").select("id", { count: "exact", head: true }).eq("preparador_id", perfilId);
+  return (count ?? 0) > 0;
 }
