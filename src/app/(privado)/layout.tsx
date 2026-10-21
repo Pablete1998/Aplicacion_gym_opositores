@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { perfilActual, type Rol } from "@/lib/datos";
 import { salir } from "@/app/login/actions";
+import { Logo } from "@/components/Logo";
 
 // Todo depende de la sesión del usuario: se renderiza en el servidor en cada petición
 export const instant = false;
@@ -19,8 +20,8 @@ export default async function LayoutPrivado({ children }: { children: React.Reac
       <header className="top">
         <div className="wrap">
           <Link href="/" className="logo">
-            <i />
-            Academia Opositores
+            <Logo />
+            Fer&apos;s Team
           </Link>
           <nav className="nav">
             {MENU[perfil.rol].map(([href, texto]) => (

@@ -7,7 +7,7 @@ const body = IBM_Plex_Sans({ subsets: ["latin"], weight: ["400", "500", "600"], 
 const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variable: "--f-mono" });
 
 export const metadata: Metadata = {
-  title: "Academia Opositores",
+  title: "Fer's Team · Academia de opositores",
   description: "Seguimiento de pruebas físicas y teóricas, evolución y acceso de los opositores",
 };
 
