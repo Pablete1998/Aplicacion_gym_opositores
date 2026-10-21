@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { baremoAplicable, edadEn, estadoMarca, formatoMarca, leerMarca, progreso, type Baremo } from "./baremo.ts";
+import { baremoAplicable, edadEn, estadoMarca, formatoMarca, leerMarca, progreso, puntosMarca, type Baremo } from "./baremo.ts";
 
 const circuito: Baremo = { unidad: "segundos", mayorEsMejor: false, minima: 12, objetivo: 10.6 };
 const dominadas: Baremo = { unidad: "repeticiones", mayorEsMejor: true, minima: 5, objetivo: 13 };
@@ -56,4 +56,17 @@ test("edad cumplida", () => {
   assert.equal(edadEn("2000-10-22", new Date("2026-10-21")), 25);
   assert.equal(edadEn("2000-10-21", new Date("2026-10-21")), 26);
   assert.equal(edadEn(null), null);
+});
+
+test("puntos según la tabla de Policía Nacional", () => {
+  const agilidad: Baremo = { ...circuito, minima: 10.5, objetivo: 9.3, puntos: [11.6, 11.4, 11.2, 10.9, 10.5, 10.1, 9.7, 9.3, 8.8, 8.2] };
+  assert.equal(puntosMarca(agilidad, 11.7), 0);
+  assert.equal(puntosMarca(agilidad, 11.6), 1);
+  assert.equal(puntosMarca(agilidad, 10.3), 5);
+  assert.equal(puntosMarca(agilidad, 8.0), 10);
+  const dom: Baremo = { ...dominadas, puntos: [5, 6, 7, 8, 10, 12, 14, 15, 16, 17] };
+  assert.equal(puntosMarca(dom, 4), 0);
+  assert.equal(puntosMarca(dom, 11), 5);
+  assert.equal(puntosMarca(dom, 25), 10);
+  assert.equal(puntosMarca(circuito, 10), null);
 });

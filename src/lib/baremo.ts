@@ -8,6 +8,8 @@ export interface Baremo {
   mayorEsMejor: boolean;
   minima: number;
   objetivo: number | null;
+  // Marca necesaria para cada punto, de 1 a 10, en oposiciones que puntúan (Policía Nacional)
+  puntos?: number[] | null;
 }
 
 export function formatoMarca(unidad: Unidad, valor: number): string {
@@ -50,6 +52,16 @@ export function estadoMarca(b: Baremo, valor: number): Estado {
   return mejorOIgual(b, valor, b.minima) ? "apto" : "no_apto";
 }
 
+// Puntos (0 a 10) que da la marca según la tabla del baremo; null si la oposición no puntúa
+export function puntosMarca(b: Baremo, valor: number): number | null {
+  if (!b.puntos?.length) return null;
+  let p = 0;
+  b.puntos.forEach((referencia, i) => {
+    if (mejorOIgual(b, valor, referencia)) p = i + 1;
+  });
+  return p;
+}
+
 export const ETIQUETA_ESTADO: Record<Estado, string> = {
   objetivo: "Objetivo",
   apto: "Apto",
@@ -70,6 +82,7 @@ export interface BaremoFila {
   edad_max: number;
   marca_minima: number;
   marca_objetivo: number | null;
+  puntos?: number[] | null;
 }
 
 // Elige el baremo más específico para el alumno: primero el de su sexo, luego el común

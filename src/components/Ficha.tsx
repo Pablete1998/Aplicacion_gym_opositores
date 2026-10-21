@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ETIQUETA_ESTADO, estadoMarca, formatoMarca, progreso } from "@/lib/baremo";
+import { ETIQUETA_ESTADO, estadoMarca, formatoMarca, progreso, puntosMarca } from "@/lib/baremo";
 import type { Ficha as FichaDatos } from "@/lib/datos";
 import { Grafica } from "./Grafica";
 
@@ -25,23 +25,32 @@ export function Ficha({ ficha, pruebaId, base }: { ficha: FichaDatos; pruebaId?:
 
       <section className="panel">
         <h2>Situación frente al baremo</h2>
+        {ficha.oposicion.baremo_fuente && <p className="sub">Baremo: {ficha.oposicion.baremo_fuente}.</p>}
         <div className="pruebas">
           {ficha.pruebas.map((p) => {
             const ultima = p.serie[p.serie.length - 1];
             const estado = ultima && p.baremo ? estadoMarca(p.baremo, ultima.marca) : null;
+            const puntos = ultima && p.baremo ? puntosMarca(p.baremo, ultima.marca) : null;
             return (
               <Link key={p.id} href={`${base}?prueba=${p.id}`} className="prueba" aria-current={p.id === sel?.id} scroll={false}>
                 <div className="row">
                   <span>{p.nombre}</span>
                   {estado && <span className={`pill p-${estado}`}>{ETIQUETA_ESTADO[estado]}</span>}
                 </div>
-                <div className="v">{ultima ? formatoMarca(p.unidad, ultima.marca) : "Sin marcas"}</div>
+                <div className="v">
+                  {ultima ? formatoMarca(p.unidad, ultima.marca) : "Sin marcas"}
+                  {puntos !== null && <span className="m"> · {puntos} {puntos === 1 ? "punto" : "puntos"}</span>}
+                </div>
                 {ultima && p.baremo && estado && (
                   <div className="barra">
                     <span style={{ width: `${progreso(p.baremo, ultima.marca) * 100}%`, background: COLOR[estado] }} />
                   </div>
                 )}
-                {p.baremo && (
+                {p.baremo?.puntos ? (
+                  <div className="m">
+                    1 punto con {formatoMarca(p.unidad, p.baremo.puntos[0])} · 5 con {formatoMarca(p.unidad, p.baremo.puntos[4])} · 10 con {formatoMarca(p.unidad, p.baremo.puntos[9])}
+                  </div>
+                ) : p.baremo && (
                   <div className="m">
                     Mínimo {formatoMarca(p.unidad, p.baremo.minima)}
                     {p.baremo.objetivo != null && ` · objetivo ${formatoMarca(p.unidad, p.baremo.objetivo)}`}
@@ -64,7 +73,7 @@ export function Ficha({ ficha, pruebaId, base }: { ficha: FichaDatos; pruebaId?:
             <div className="tbl">
               <table>
                 <thead>
-                  <tr><th>Fecha</th><th>Marca</th><th>Estado</th></tr>
+                  <tr><th>Fecha</th><th>Marca</th>{sel.baremo?.puntos && <th>Puntos</th>}<th>Estado</th></tr>
                 </thead>
                 <tbody>
                   {[...sel.serie].reverse().map((s, i) => {
@@ -73,6 +82,7 @@ export function Ficha({ ficha, pruebaId, base }: { ficha: FichaDatos; pruebaId?:
                       <tr key={`${s.fecha}-${i}`}>
                         <td className="num">{fechaLarga(s.fecha)}</td>
                         <td className="num">{formatoMarca(sel.unidad, s.marca)}</td>
+                        {sel.baremo?.puntos && <td className="num">{puntosMarca(sel.baremo, s.marca)}</td>}
                         <td>{estado && <span className={`pill p-${estado}`}>{ETIQUETA_ESTADO[estado]}</span>}</td>
                       </tr>
                     );

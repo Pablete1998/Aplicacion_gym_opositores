@@ -26,14 +26,14 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql` y `supabase/migrations/0002_personal.sql`.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql` y `supabase/migrations/0003_baremos_oficiales.sql`.
 3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
    La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.
 5. Crea el primer usuario de dirección en Supabase (Authentication → Users) y ponle `rol = 'direccion'` en `perfiles`.
    El resto de accesos se crean desde la página Personal de la app.
 
-> Los baremos de `seed.sql` son **orientativos**. Antes de usar la app con alumnos hay que cargar los oficiales de cada convocatoria.
+> `0003_baremos_oficiales.sql` carga los baremos de las últimas convocatorias del BOE (Policía Nacional, Guardia Civil y Fuerzas Armadas). Los de Bombero siguen siendo **orientativos** porque dependen de cada ayuntamiento o consorcio. Se editan desde **Oposiciones** en la app.
 
 ## Comprobaciones
 
