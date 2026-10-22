@@ -71,6 +71,12 @@ input, select, textarea { font: inherit; color: var(--ink); background: var(--bg
 .grafica svg { width: 100%; height: auto; display: block; }
 .grafica text { fill: var(--muted); font: 11px var(--f-mono), monospace; }
 .leyenda { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+.grid2 > .panel { align-content: start; }
+.btn.ghost[aria-current="true"] { background: var(--fuego); color: var(--signal-ink); border-color: transparent; }
+.hoja { display: grid; gap: 12px; }
+.hoja td { padding-block: 6px; }
+.hoja input { max-width: 120px; font-family: var(--f-mono), monospace; font-size: 18px; }
+.hoja .nombre { color: var(--ink); font-size: 14px; }
 .aviso { padding: 10px 12px; border-radius: 8px; }
 .aviso.ok { background: var(--ok-soft); color: var(--ok); }
 .aviso.error { background: var(--bad-soft); color: var(--bad); }
