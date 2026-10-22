@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Barlow_Condensed, IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
 import "./globals.css";
 
@@ -9,6 +9,11 @@ const mono = IBM_Plex_Mono({ subsets: ["latin"], weight: ["400", "500"], variabl
 export const metadata: Metadata = {
   title: "Fer's Team · Academia de opositores",
   description: "Seguimiento de pruebas físicas y teóricas, evolución y acceso de los opositores",
+  appleWebApp: { capable: true, title: "Fer's Team", statusBarStyle: "black-translucent" },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b0b0b",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
