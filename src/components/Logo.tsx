@@ -1,6 +1,6 @@
 // Logo de Fer's Team redibujado en vectorial a partir del grabado en pizarra.
 // El contorno usa el color del texto y el relleno el amarillo de la marca.
-const RELLENO = "var(--signal)";
+const RELLENO = "var(--logo-rojo)";
 const FONDO = "var(--logo-fondo, var(--brand))";
 
 export function Logo({ conNombre = false, className }: { conNombre?: boolean; className?: string }) {

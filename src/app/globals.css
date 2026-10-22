@@ -10,6 +10,7 @@
   --signal: #ff4d1a;
   --signal-ink: #ffffff;
   --signal-soft: #3d1408;
+  --logo-rojo: #f51d2a;
   --ok: #5cc98a;
   --ok-soft: #12301f;
   --warn: #ffb547;
@@ -31,7 +32,7 @@ a { color: inherit; }
 .top .wrap { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 20px; padding-block: 12px; }
 .logo { font-family: var(--f-display), sans-serif; font-weight: 700; font-size: 22px; display: flex; align-items: center; gap: 10px; text-decoration: none; }
 .logo svg { height: 36px; width: auto; }
-.logo-grande { width: 240px; height: auto; margin: 0 auto; display: block; color: var(--ink); --logo-fondo: var(--bg); filter: drop-shadow(0 0 18px rgba(255, 77, 26, .45)); }
+.logo-grande { width: 240px; height: auto; margin: 0 auto; display: block; color: var(--ink); --logo-fondo: var(--bg); filter: drop-shadow(0 0 18px rgba(245, 29, 42, .45)); }
 .lema { font-family: var(--f-display), sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: .2em; color: var(--signal); text-align: center; margin: 0; }
 .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .nav { display: flex; gap: 4px; flex-wrap: wrap; }
