@@ -8,13 +8,15 @@ export default async function Registrar({ searchParams }: PageProps<"/registrar"
   const supabase = await createClient();
   const { data } = await supabase
     .from("alumnos")
-    .select("id, nombre, apellidos, sexo, oposiciones(pruebas(id, nombre, unidad, orden, sexo))")
+    .select("id, nombre, apellidos, sexo, grupos(nombre), oposiciones(nombre, pruebas(id, nombre, unidad, orden, sexo))")
     .eq("activo", true)
     .order("apellidos");
 
   const alumnos: Opcion[] = (data ?? []).map((a) => ({
     id: a.id,
     nombre: `${a.apellidos}, ${a.nombre}`,
+    oposicion: uno(a.oposiciones)?.nombre ?? "",
+    grupo: uno(a.grupos)?.nombre ?? null,
     pruebas: (uno(a.oposiciones)?.pruebas ?? [])
       .filter((p) => p.sexo === null || p.sexo === a.sexo)
       .sort((x, y) => x.orden - y.orden),
