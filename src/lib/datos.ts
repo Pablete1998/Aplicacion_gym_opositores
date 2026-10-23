@@ -82,6 +82,7 @@ export interface PruebaFicha {
   nombre: string;
   tipo: "fisica" | "teorica";
   unidad: Unidad;
+  mayorEsMejor: boolean;
   baremo: Baremo | null;
   serie: { fecha: string; marca: number }[];
 }
@@ -139,6 +140,7 @@ export async function cargarFicha(alumnoId: string): Promise<Ficha | null> {
         nombre: p.nombre,
         tipo: p.tipo,
         unidad: p.unidad,
+        mayorEsMejor: p.mayor_es_mejor,
         baremo: fila
           ? {
               unidad: p.unidad as Unidad,

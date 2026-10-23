@@ -7,8 +7,8 @@ import { Logo } from "@/components/Logo";
 export const instant = false;
 
 const MENU: Record<Rol, [string, string][]> = {
-  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"], ["/acceso", "Acceso"], ["/cuotas", "Cuotas"], ["/oposiciones", "Oposiciones"], ["/personal", "Personal"]],
-  preparador: [["/alumnos", "Mis alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"]],
+  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"], ["/informes", "Informes"], ["/acceso", "Acceso"], ["/cuotas", "Cuotas"], ["/oposiciones", "Oposiciones"], ["/personal", "Personal"]],
+  preparador: [["/alumnos", "Mis alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"], ["/informes", "Informes"]],
   alumno: [["/mi", "Mi evolución"]],
   recepcion: [["/acceso", "Acceso"]],
 };
