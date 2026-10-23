@@ -259,8 +259,12 @@ td .puesto { font-size: 16px; }
   41% { opacity: .9; }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(2.6); }
 }
+@keyframes parpadeo {
+  from { transform: scale(1, .82) skewX(-4deg); }
+  to { transform: scale(.92, 1.18) skewX(5deg); }
+}
 @keyframes llamarada {
-  from { transform: translateY(40%); opacity: 1; }
+  from { transform: translateY(55%); opacity: 1; }
   80% { opacity: 1; }
   to { transform: translateY(-110vh); opacity: 0; }
 }
@@ -300,17 +304,20 @@ td .puesto { font-size: 16px; }
   ::view-transition-group(golpe) { z-index: 3; }
   /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
   :root:active-view-transition .llamarada {
-    display: block; position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 55; pointer-events: none;
+    display: block; position: fixed; left: -5%; right: -5%; bottom: 0; height: 80vh; z-index: 55; pointer-events: none;
     view-transition-name: llamarada;
-    background:
-      radial-gradient(ellipse 30% 40% at 20% 60%, rgba(255, 200, 80, .9), transparent 70%),
-      radial-gradient(ellipse 25% 45% at 55% 55%, rgba(255, 120, 0, .95), transparent 70%),
-      radial-gradient(ellipse 30% 40% at 85% 62%, rgba(255, 60, 0, .9), transparent 70%),
-      linear-gradient(to top, transparent, rgba(255, 46, 0, .85) 30%, rgba(255, 138, 0, .7) 55%, transparent);
-    filter: blur(16px);
-    mix-blend-mode: screen;
-    animation: 480ms cubic-bezier(.5, 0, .6, 1) both llamarada;
+    /* Debajo de las llamas, la brasa: rojo intenso que se apaga hacia abajo */
+    background: linear-gradient(to bottom, transparent 0 44%, #d6260a 45%, #b81a04 60%, rgba(120, 10, 0, .85) 80%, transparent);
+    animation: 520ms cubic-bezier(.5, 0, .6, 1) both llamarada;
   }
+  .llamarada svg {
+    display: block; width: 100%; height: 45%;
+    filter: drop-shadow(0 0 18px rgba(255, 110, 0, .9)) blur(1.5px);
+  }
+  /* Cada llama crece y se encoge a su ritmo, como fuego de verdad */
+  .llamarada .llama { transform-box: fill-box; transform-origin: 50% 100%; animation: 160ms ease-in-out infinite alternate parpadeo; }
+  .llamarada .llama:nth-child(3n) { animation-duration: 130ms; }
+  .llamarada .llama:nth-child(3n + 1) { animation-duration: 190ms; }
   ::view-transition-group(llamarada), ::view-transition-new(llamarada), ::view-transition-old(llamarada) { animation: none; mix-blend-mode: screen; }
   ::view-transition-group(llamarada) { z-index: 2; }
   ::view-transition-group(.pastilla) { animation-duration: 340ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }

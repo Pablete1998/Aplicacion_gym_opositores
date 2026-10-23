@@ -18,6 +18,23 @@ const GRIETAS = [
   "M52 -22 L60 6 L44 12 M38 40 L-4 44 L-20 36 M-46 26 L-62 -14 L-40 -18 M-26 -50 L20 -58",
 ];
 
+// Lenguas de fuego de la llamarada: posición, ancho y alto (en una caja de 1000 × 400), fijas para
+// que el servidor y el navegador pinten lo mismo
+const LLAMAS = Array.from({ length: 17 }, (_, i) => ({
+  x: i * 62 + ((i * 37) % 23) - 6,
+  ancho: 90 + ((i * 53) % 50),
+  alto: 170 + ((i * 89) % 190),
+  retraso: ((i * 71) % 9) * -40,
+}));
+
+// Una lengua de fuego: base ancha abajo, punta curvada arriba
+function lengua(x: number, ancho: number, alto: number, inclinacion: number) {
+  const m = ancho / 2;
+  const y = 400 - alto;
+  return `M${x - m} 400 C${x - m} ${400 - alto * 0.45} ${x - m * 0.2} ${y + alto * 0.35} ${x + inclinacion} ${y}`
+    + ` C${x + m * 0.35} ${y + alto * 0.4} ${x + m} ${400 - alto * 0.4} ${x + m} 400 Z`;
+}
+
 // Animación al cambiar de página: la página vieja arde de abajo arriba (una llamarada la barre)
 // y la nueva llega con un martillazo contra la pantalla: el martillo sube desde abajo hacia ti, golpea el
 // cristal, lo deja agrietado un momento y todo tiembla. Cambiar filtros o guardar no anima.
@@ -29,7 +46,17 @@ export function Transicion({ children }: { children: React.ReactNode }) {
         <div className="pagina">{children}</div>
       </ViewTransition>
       {/* Solo se ven mientras dura la transición (CSS :active-view-transition) */}
-      <div key={`llamas-${ruta}`} className="llamarada" aria-hidden="true" />
+      <div key={`llamas-${ruta}`} className="llamarada" aria-hidden="true">
+        <svg viewBox="0 0 1000 400" preserveAspectRatio="none">
+          {LLAMAS.map((l, i) => (
+            <g key={i} className="llama" style={{ animationDelay: `${l.retraso}ms` }}>
+              <path d={lengua(l.x, l.ancho, l.alto, i % 2 ? 14 : -14)} fill="#d6260a" />
+              <path d={lengua(l.x, l.ancho * 0.7, l.alto * 0.72, i % 2 ? 8 : -8)} fill="#ff7a12" />
+              <path d={lengua(l.x, l.ancho * 0.38, l.alto * 0.42, 0)} fill="#ffe27a" />
+            </g>
+          ))}
+        </svg>
+      </div>
       <div key={`golpe-${ruta}`} className="golpe" aria-hidden="true">
         <span className="destello" />
         <svg className="grietas" viewBox="-100 -100 200 200">
