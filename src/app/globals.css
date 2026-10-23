@@ -226,20 +226,21 @@ td .puesto { font-size: 16px; }
   40% { filter: sepia(.6) saturate(3) hue-rotate(-25deg) brightness(1.15); }
   100% { mask-position: 0 100%; filter: sepia(1) saturate(5) hue-rotate(-30deg) brightness(.6); opacity: 0; }
 }
-/* La página nueva es la cara de un martillo gigante: sube desde abajo cada vez más deprisa, llena la
-   pantalla al golpear (~750 ms) y tiembla. El bisel de acero (.cara) hace exactamente lo mismo */
+/* La página nueva es la cara de un martillo gigante: asoma por abajo con el mango a la vista, coge impulso,
+   llena la pantalla al golpear (~870 ms) y tiembla. El bisel de acero (.cara) hace exactamente lo mismo */
 @keyframes cara {
-  0% { transform: translateY(75vh) scale(.22) rotate(-5deg); animation-timing-function: cubic-bezier(.55, 0, .9, .55); }
-  60% { transform: none; animation-timing-function: ease-out; }
-  64% { transform: translateY(8px) scale(.985); }
-  70% { transform: translate(-12px, 3px) rotate(-.5deg); }
-  76% { transform: translate(10px, -3px) rotate(.4deg); }
-  82% { transform: translate(-6px, 2px); }
-  90% { transform: translate(3px, 0); }
+  0% { transform: translateY(60vh) scale(.16) rotate(-16deg); animation-timing-function: cubic-bezier(.2, .6, .4, 1); }
+  35% { transform: translateY(26vh) scale(.32) rotate(-9deg); animation-timing-function: cubic-bezier(.6, 0, .95, .5); }
+  62% { transform: none; animation-timing-function: ease-out; }
+  66% { transform: translateY(10px) scale(.98); }
+  72% { transform: translate(-14px, 4px) rotate(-.6deg); }
+  78% { transform: translate(12px, -3px) rotate(.5deg); }
+  84% { transform: translate(-7px, 2px); }
+  92% { transform: translate(3px, 0); }
   100% { transform: none; }
 }
 /* El bisel y el mango desaparecen tras el golpe y queda solo la página */
-@keyframes soltar { 0%, 62% { opacity: 1; } 78%, 100% { opacity: 0; } }
+@keyframes soltar { 0%, 64% { opacity: 1; } 82%, 100% { opacity: 0; } }
 /* El cristal se raja de golpe y luego se desvanece */
 @keyframes grietas {
   0%, 38% { opacity: 0; }
@@ -275,10 +276,10 @@ td .puesto { font-size: 16px; }
     mask-size: 100% 260%;
     mask-repeat: no-repeat;
   }
-  /* El golpe cae a los ~750 ms: la página llena la pantalla, el cristal se raja y todo tiembla */
+  /* El golpe cae a los ~870 ms: la página llena la pantalla, el cristal se raja y todo tiembla */
   ::view-transition-new(.martillazo) {
     transform-origin: 50% calc(var(--cara-alto, 50vh) / 2);
-    animation: 1250ms both cara;
+    animation: 1400ms both cara;
   }
   :root:active-view-transition .golpe {
     display: block; position: fixed; inset: 0; z-index: 56; pointer-events: none;
@@ -287,31 +288,31 @@ td .puesto { font-size: 16px; }
   /* Bisel de acero alrededor de la parte visible de la página nueva: cuatro caras con la luz arriba a la izquierda */
   .golpe .cara {
     position: absolute; box-sizing: content-box;
-    left: calc(var(--cara-x, 0px) - 20px); top: calc(var(--cara-y, 0px) - 20px);
+    left: calc(var(--cara-x, 0px) - 26px); top: calc(var(--cara-y, 0px) - 26px);
     width: var(--cara-ancho, 100vw); height: var(--cara-alto, 60vh);
-    border: 20px solid; border-color: #eef0f2 #5f656d #3c4147 #b4bac1;
+    border: 26px solid; border-color: #eef0f2 #5f656d #3c4147 #b4bac1;
     outline: 2px solid #1b1d20; border-radius: 4px;
     box-shadow: 0 40px 80px rgba(0, 0, 0, .75), inset 0 0 0 2px rgba(0, 0, 0, .5);
-    animation: 1250ms both cara, 1250ms linear both soltar;
+    animation: 1400ms both cara, 1400ms linear both soltar;
   }
-  .golpe .mango { position: absolute; left: 50%; top: calc(100% + 20px); width: 90px; height: auto; transform: translateX(-50%); }
+  .golpe .mango { position: absolute; left: 50%; top: calc(100% + 26px); width: clamp(80px, 26%, 150px); height: auto; transform: translateX(-50%); }
   .golpe .grietas {
     position: absolute; left: calc(var(--cara-x, 0px) + var(--cara-ancho, 100vw) / 2); top: calc(var(--cara-y, 0px) + var(--cara-alto, 84vh) / 2); width: min(1100px, 190vw); height: auto; transform: translate(-50%, -50%);
     fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: .7; stroke-linejoin: bevel;
     filter: drop-shadow(0 0 1.5px rgba(255, 180, 90, .9));
-    animation: 1950ms linear both grietas;
+    animation: 2250ms linear both grietas;
   }
-  .golpe .grietas path { stroke-dasharray: 1; animation: 1950ms ease-out both rajar; }
+  .golpe .grietas path { stroke-dasharray: 1; animation: 2250ms ease-out both rajar; }
   .golpe .destello {
     position: absolute; left: calc(var(--cara-x, 0px) + var(--cara-ancho, 100vw) / 2); top: calc(var(--cara-y, 0px) + var(--cara-alto, 84vh) / 2); width: 220px; height: 220px; border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #ffd27a 25%, rgba(255, 77, 26, .6) 50%, transparent 70%);
-    animation: 1950ms ease-out both destello;
+    animation: 2250ms ease-out both destello;
   }
   ::view-transition-group(golpe), ::view-transition-new(golpe), ::view-transition-old(golpe) { animation: none; }
   /* El golpe siempre por encima de las páginas, que si no tapan las grietas */
   ::view-transition-group(golpe) { z-index: 3; }
   /* La transición dura hasta que se apagan las grietas, que si no desaparecen de golpe al terminar */
-  ::view-transition-new(golpe) { animation: 1950ms linear both mantener; }
+  ::view-transition-new(golpe) { animation: 2250ms linear both mantener; }
   /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
   :root:active-view-transition .llamarada {
     display: block; position: fixed; left: -5%; right: -5%; bottom: 0; height: 80vh; z-index: 55; pointer-events: none;
@@ -333,7 +334,9 @@ td .puesto { font-size: 16px; }
   .llamarada .llama:nth-child(3n) { animation-duration: 130ms; }
   .llamarada .llama:nth-child(3n + 1) { animation-duration: 190ms; }
   ::view-transition-group(llamarada), ::view-transition-new(llamarada), ::view-transition-old(llamarada) { animation: none; mix-blend-mode: screen; }
-  ::view-transition-group(llamarada) { z-index: 2; }
+  ::view-transition-group(llamarada) { z-index: 1; }
+  /* La cara del martillo pasa por delante de las llamas */
+  ::view-transition-group(.martillazo) { z-index: 2; }
   ::view-transition-group(.pastilla) { animation-duration: 340ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }
 }
 @media (prefers-reduced-motion: reduce) {
