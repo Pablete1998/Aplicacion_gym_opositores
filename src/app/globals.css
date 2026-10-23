@@ -160,3 +160,5 @@ details[open] summary { margin-bottom: 8px; }
 @media (max-width: 720px) { .filtros { grid-template-columns: 1fr 1fr; } .filtros > label:first-child { grid-column: 1 / -1; } }
 .casilla { display: flex; align-items: center; gap: 8px; color: var(--ink); padding-bottom: 10px; }
 .casilla input { width: auto; }
+.pagar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.pagar .sub { margin: 0; }

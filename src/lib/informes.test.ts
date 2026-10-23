@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { diasDesde, enMes, mejorDe, mesAnterior, mesSiguiente, nombreMes, tendencia } from "./informes.ts";
+import { diasDesde, enMes, mejorDe, mesActual, mesAnterior, mesSiguiente, nombreMes, tendencia } from "./informes.ts";
 
 test("tendencia en tiempos: bajar es mejorar", () => {
   const serie = [
@@ -40,4 +40,10 @@ test("fechas por meses", () => {
 test("mejor marca", () => {
   assert.equal(mejorDe([{ fecha: "a", marca: 10.2 }, { fecha: "b", marca: 9.9 }], false), 9.9);
   assert.equal(mejorDe([], true), null);
+});
+
+test("mes en curso en hora de España", () => {
+  // 31 de octubre a las 23:30 UTC ya es 1 de noviembre en Madrid
+  assert.equal(mesActual(new Date("2026-10-31T23:30:00Z")), "2026-11");
+  assert.equal(mesActual(new Date("2026-10-15T10:00:00Z")), "2026-10");
 });
