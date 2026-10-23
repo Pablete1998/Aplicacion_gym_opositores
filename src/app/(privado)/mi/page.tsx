@@ -5,6 +5,7 @@ import { Instalar } from "@/components/Instalar";
 import { formatoMarca, siguienteMeta, type Unidad } from "@/lib/baremo";
 import { cargarFicha, diasDeAsistencia, exigirRol, miAlumnoId } from "@/lib/datos";
 import { ETIQUETA_TENDENCIA, mesDe, type Tendencia } from "@/lib/informes";
+import { hoyEnEspana } from "@/lib/sesiones";
 import { clasificar } from "@/lib/simulacro";
 import { createClient } from "@/lib/supabase/server";
 import { esClaveToque, MENSAJES_TOQUE } from "@/lib/toques";
@@ -30,12 +31,15 @@ export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
   if (!id || !ficha) return <p className="sub">Tu usuario aún no está vinculado a una ficha de alumno. Avisa en recepción.</p>;
 
   const supabase = await createClient();
-  const [qr, dias, { data: toquesDatos }, { data: rankingDatos }] = await Promise.all([
+  const [qr, dias, { data: toquesDatos }, { data: rankingDatos }, { data: planHoy }] = await Promise.all([
     QRCode.toString(ficha.codigo_acceso, { type: "svg", margin: 1 }),
     diasDeAsistencia(id, mesDe(new Date())),
     supabase.rpc("mis_toques"),
     supabase.rpc("ranking_mi_grupo", { p_desde: haceDias(DIAS_RANKING), p_antes: haceDias(DIAS_RANKING * 2) }),
+    // Plan de hoy de su grupo (RLS) y si ya ha empezado o terminado la sesión
+    supabase.from("planes").select("titulo, plan_ejercicios(id), sesiones(terminada_en)").eq("fecha", hoyEnEspana()).maybeSingle(),
   ]);
+  const sesionHoy = planHoy?.sesiones[0];
   // Si la migración 0004 aún no está aplicada, las funciones fallan y no se muestra ni ranking ni toques
   const toques = toquesDatos as ToqueRecibido[] | null;
   const ranking = rankingDatos as FilaRanking[] | null;
@@ -76,6 +80,20 @@ export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
           <form action={marcarToquesLeidos}>
             <button className="btn ghost">Visto</button>
           </form>
+        </section>
+      )}
+      {planHoy && (
+        <section className="panel proximo">
+          <div className="row">
+            <div>
+              <h2>Sesión de hoy: {planHoy.titulo}</h2>
+              <p className="sub">
+                {planHoy.plan_ejercicios.length} ejercicios ·{" "}
+                {sesionHoy?.terminada_en ? "¡Terminada!" : sesionHoy ? "En curso" : ficha.cuota_al_dia ? "Sin empezar" : "Cuota pendiente"}
+              </p>
+            </div>
+            <Link href="/mi/sesion" className="btn">{sesionHoy?.terminada_en ? "Ver" : sesionHoy ? "Seguir" : "Empezar"}</Link>
+          </div>
         </section>
       )}
       <Instalar />

@@ -20,6 +20,7 @@ const ICONOS = {
   oposiciones: "M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5zM4 21.5A2.5 2.5 0 0 0 6.5 24H20",
   personal: "M15 7a4 4 0 1 1-5.6 3.7L3 17v4h4v-2h2v-2h2l1.3-1.3A4 4 0 0 1 15 7ZM16.5 8.5v.01",
   mi: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM4 22a8 8 0 0 1 16 0",
+  planificar: "M4 5h16v16H4zM4 10h16M9 3v4M15 3v4M8 14h3M8 17h6",
   mas: "M5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM19 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
 } as const;
 
@@ -30,6 +31,7 @@ const MENU: Record<Rol, Entrada[]> = {
     ["/alumnos", "Alumnos", "alumnos"],
     ["/registrar", "Registrar", "registrar"],
     ["/acceso", "Acceso", "acceso"],
+    ["/planificar", "Planificar", "planificar"],
     ["/simulacro", "Simulacros", "simulacros"],
     ["/informes", "Informes", "informes"],
     ["/cuotas", "Cuotas", "cuotas"],
@@ -40,10 +42,14 @@ const MENU: Record<Rol, Entrada[]> = {
     ["/panel", "Inicio", "inicio"],
     ["/alumnos", "Mis alumnos", "alumnos"],
     ["/registrar", "Registrar", "registrar"],
+    ["/planificar", "Planificar", "planificar"],
     ["/simulacro", "Simulacros", "simulacros"],
     ["/informes", "Informes", "informes"],
   ],
-  alumno: [["/mi", "Mi evolución", "mi"]],
+  alumno: [
+    ["/mi/sesion", "Sesión de hoy", "registrar"],
+    ["/mi", "Mi evolución", "mi"],
+  ],
   recepcion: [["/acceso", "Acceso", "acceso"]],
 };
 const EN_BARRA = 5;
@@ -60,7 +66,10 @@ export function Menu({ rol }: { rol: Rol }) {
   const ruta = usePathname();
   const mas = useRef<HTMLDetailsElement>(null);
   const entradas = MENU[rol];
-  const activa = (href: string) => ruta === href || ruta.startsWith(`${href}/`);
+  // La entrada más concreta que coincide con la ruta (en /mi/sesion, «Sesión de hoy» y no «Mi evolución»)
+  const coincide = (href: string) => ruta === href || ruta.startsWith(`${href}/`);
+  const actual = [...entradas.map(([href]) => href), "/cuenta"].filter(coincide).sort((a, b) => b.length - a.length)[0];
+  const activa = (href: string) => href === actual;
   const sobran = entradas.length > EN_BARRA;
   const enBarra = sobran ? entradas.slice(0, EN_BARRA - 1) : entradas;
   const enMas = sobran ? entradas.slice(EN_BARRA - 1) : [];
