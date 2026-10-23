@@ -28,7 +28,7 @@ begin
   select s.alumno_id, p.fecha, e.prueba_id into v_alumno, v_fecha, v_prueba
   from sesiones s join planes p on p.id = s.plan_id join plan_ejercicios e on e.id = m.ejercicio_id
   where s.id = m.sesion_id;
-  if not (mi_rol() = 'direccion' or (mi_rol() = 'preparador' and es_preparador_de(v_alumno))) then
+  if not coalesce(mi_rol() = 'direccion' or (mi_rol() = 'preparador' and es_preparador_de(v_alumno)), false) then
     raise exception 'Solo su preparador o dirección pueden validar esta marca';
   end if;
   if v_prueba is null then raise exception 'Este ejercicio no es una prueba oficial'; end if;
@@ -51,7 +51,7 @@ begin
   select * into m from sesion_marcas where id = p_marca;
   if not found then raise exception 'Marca no encontrada'; end if;
   select alumno_id into v_alumno from sesiones where id = m.sesion_id;
-  if not (mi_rol() = 'direccion' or (mi_rol() = 'preparador' and es_preparador_de(v_alumno))) then
+  if not coalesce(mi_rol() = 'direccion' or (mi_rol() = 'preparador' and es_preparador_de(v_alumno)), false) then
     raise exception 'Solo su preparador o dirección pueden anular esta validación';
   end if;
   update sesion_marcas set resultado_id = null, validada_por = null where id = p_marca;
