@@ -263,6 +263,10 @@ td .puesto { font-size: 16px; }
   from { transform: scale(1, .82) skewX(-4deg); }
   to { transform: scale(.92, 1.18) skewX(5deg); }
 }
+@keyframes chispa {
+  from { transform: translate(0, 0); opacity: 1; }
+  to { transform: translate(14px, -60px); opacity: 0; }
+}
 @keyframes llamarada {
   from { transform: translateY(55%); opacity: 1; }
   80% { opacity: 1; }
@@ -307,12 +311,16 @@ td .puesto { font-size: 16px; }
     display: block; position: fixed; left: -5%; right: -5%; bottom: 0; height: 80vh; z-index: 55; pointer-events: none;
     view-transition-name: llamarada;
     /* Debajo de las llamas, la brasa: rojo intenso que se apaga hacia abajo */
-    background: linear-gradient(to bottom, transparent 0 44%, #d6260a 45%, #b81a04 60%, rgba(120, 10, 0, .85) 80%, transparent);
+    background: linear-gradient(to bottom, transparent 0 41%, #ffe6a0 44.5%, #ff8a12 50%, #e3300b 58%, #b81a04 68%, rgba(120, 10, 0, .85) 80%, transparent);
     animation: 520ms cubic-bezier(.5, 0, .6, 1) both llamarada;
   }
   .llamarada svg {
     display: block; width: 100%; height: 45%;
-    filter: drop-shadow(0 0 18px rgba(255, 110, 0, .9)) blur(1.5px);
+    filter: drop-shadow(0 0 24px rgba(255, 110, 0, .8));
+  }
+  .llamarada .chispa {
+    position: absolute; border-radius: 50%; background: #ffd66b; box-shadow: 0 0 6px 2px rgba(255, 140, 0, .9);
+    animation: 420ms ease-out infinite chispa;
   }
   /* Cada llama crece y se encoge a su ritmo, como fuego de verdad */
   .llamarada .llama { transform-box: fill-box; transform-origin: 50% 100%; animation: 160ms ease-in-out infinite alternate parpadeo; }
