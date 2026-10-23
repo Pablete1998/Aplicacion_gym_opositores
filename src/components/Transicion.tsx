@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { ViewTransition } from "react";
+import { useLayoutEffect, useRef, ViewTransition } from "react";
 
 // Grietas del cristal: rayos quebrados desde el punto del golpe y dos anillos rotos
 const GRIETAS = [
@@ -91,10 +91,11 @@ function Llamas() {
   );
 }
 
-// El martillo visto de frente: cara de acero cuadrada con bisel, collar y mango de madera con empuñadura de goma
-function Martillo() {
+// El mango del martillo: collar de acero, madera con vetas y empuñadura de goma estriada.
+// La cabeza es la propia página nueva, enmarcada por un bisel de acero (CSS .cara)
+function Mango() {
   return (
-    <svg className="martillo" viewBox="0 0 200 400">
+    <svg className="mango" viewBox="0 0 60 400" preserveAspectRatio="xMidYMin meet">
       <defs>
         <linearGradient id="vt-madera" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#4a2610" />
@@ -107,58 +108,46 @@ function Martillo() {
           <stop offset=".45" stopColor="#d8331a" />
           <stop offset="1" stopColor="#4a0a04" />
         </linearGradient>
-        <linearGradient id="vt-cara" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0" stopColor="#e9ecef" />
-          <stop offset=".45" stopColor="#9aa1a9" />
-          <stop offset=".6" stopColor="#b9bec4" />
-          <stop offset="1" stopColor="#5d636b" />
-        </linearGradient>
         <linearGradient id="vt-collar" x1="0" y1="0" x2="1" y2="0">
           <stop offset="0" stopColor="#3b3f45" />
           <stop offset=".4" stopColor="#c9ced4" />
           <stop offset="1" stopColor="#2e3237" />
         </linearGradient>
-        <radialGradient id="vt-brillo" cx="30%" cy="25%" r="45%">
-          <stop offset="0" stopColor="#fff" stopOpacity=".9" />
-          <stop offset="1" stopColor="#fff" stopOpacity="0" />
-        </radialGradient>
-        {/* Acero cepillado: vetas finas en diagonal */}
-        <filter id="vt-cepillado" x="0" y="0" width="100%" height="100%">
-          <feTurbulence type="fractalNoise" baseFrequency="0.9 0.012" numOctaves="2" seed="7" />
-          <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 .5 0" />
-          <feComposite in2="SourceGraphic" operator="in" />
-        </filter>
       </defs>
-      {/* Mango */}
-      <path d="M86 170 L114 170 L128 398 L72 398 Z" fill="url(#vt-madera)" />
-      <path d="M93 180 C95 230 90 280 94 330 M104 182 C106 240 102 290 107 330 M99 200 C100 250 98 300 100 330" stroke="#3a1c0a" strokeWidth="1.2" fill="none" opacity=".45" />
-      <path d="M76 322 L124 322 L128 398 L72 398 Z" fill="url(#vt-goma)" />
-      {[334, 348, 362, 376, 390].map((y) => <rect key={y} x="72" y={y} width="56" height="3" fill="#000" opacity=".35" />)}
-      {/* Collar de acero entre cabeza y mango */}
-      <rect x="78" y="168" width="44" height="26" rx="3" fill="url(#vt-collar)" />
-      {/* Cabeza: bisel en cuatro caras, con la luz arriba a la izquierda */}
-      <path d="M16 8 L184 8 L162 30 L38 30 Z" fill="#eef0f2" />
-      <path d="M16 8 L38 30 L38 154 L16 176 Z" fill="#b4bac1" />
-      <path d="M184 8 L184 176 L162 154 L162 30 Z" fill="#5f656d" />
-      <path d="M16 176 L38 154 L162 154 L184 176 Z" fill="#3c4147" />
-      <rect x="38" y="30" width="124" height="124" fill="url(#vt-cara)" />
-      <rect x="38" y="30" width="124" height="124" fill="#fff" filter="url(#vt-cepillado)" opacity=".18" />
-      <path d="M48 70 L80 52 M110 128 L146 112 M60 140 L72 134" stroke="#2b2f35" strokeWidth=".8" opacity=".5" />
-      <rect x="38" y="30" width="124" height="124" fill="url(#vt-brillo)" />
-      <rect x="16" y="8" width="168" height="168" fill="none" stroke="#1b1d20" strokeWidth="2.5" />
+      <path d="M14 20 L46 20 L56 400 L4 400 Z" fill="url(#vt-madera)" />
+      <path d="M22 40 C24 120 20 200 24 270 M36 42 C38 130 34 210 38 270" stroke="#3a1c0a" strokeWidth="1.2" fill="none" opacity=".45" />
+      <path d="M8 280 L52 280 L56 400 L4 400 Z" fill="url(#vt-goma)" />
+      {[296, 316, 336, 356, 376].map((y) => <rect key={y} x="4" y={y} width="52" height="4" fill="#000" opacity=".35" />)}
+      <rect x="6" y="0" width="48" height="30" rx="3" fill="url(#vt-collar)" />
     </svg>
   );
 }
 
 // Animación al cambiar de página: la página vieja arde de abajo arriba (una llamarada la barre)
-// y la nueva llega con un martillazo contra la pantalla: el martillo sube desde abajo hacia ti, golpea el
-// cristal, lo deja agrietado un momento y todo tiembla. Cambiar filtros o guardar no anima.
+// y la nueva llega como la cara de un martillo gigante: sube desde abajo, crece hasta llenar la pantalla,
+// golpea el cristal, lo deja agrietado un momento y todo tiembla. Cambiar filtros o guardar no anima.
 export function Transicion({ children }: { children: React.ReactNode }) {
   const ruta = usePathname();
+  const pagina = useRef<HTMLDivElement>(null);
+
+  // La cabeza del martillo es la parte visible de la página nueva: se mide al cambiar de ruta para
+  // que el bisel, el mango y las grietas encajen con ella
+  useLayoutEffect(() => {
+    const el = pagina.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const alto = Math.max(120, Math.min(r.height, window.innerHeight - r.top - 12));
+    const raiz = document.documentElement.style;
+    raiz.setProperty("--cara-x", `${r.left}px`);
+    raiz.setProperty("--cara-y", `${r.top}px`);
+    raiz.setProperty("--cara-ancho", `${r.width}px`);
+    raiz.setProperty("--cara-alto", `${alto}px`);
+  }, [ruta]);
+
   return (
     <>
       <ViewTransition key={ruta} enter="martillazo" exit="arder" default="none">
-        <div className="pagina">{children}</div>
+        <div ref={pagina} className="pagina">{children}</div>
       </ViewTransition>
       {/* Solo se ven mientras dura la transición (CSS :active-view-transition) */}
       <div key={`llamas-${ruta}`} className="llamarada" aria-hidden="true">
@@ -168,11 +157,13 @@ export function Transicion({ children }: { children: React.ReactNode }) {
         ))}
       </div>
       <div key={`golpe-${ruta}`} className="golpe" aria-hidden="true">
+        <div className="cara">
+          <Mango />
+        </div>
         <span className="destello" />
         <svg className="grietas" viewBox="-100 -100 200 200">
           {GRIETAS.map((d) => <path key={d} d={d} pathLength={1} />)}
         </svg>
-        <Martillo />
       </div>
     </>
   );

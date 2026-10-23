@@ -226,26 +226,20 @@ td .puesto { font-size: 16px; }
   40% { filter: sepia(.6) saturate(3) hue-rotate(-25deg) brightness(1.15); }
   100% { mask-position: 0 100%; filter: sepia(1) saturate(5) hue-rotate(-30deg) brightness(.6); opacity: 0; }
 }
-/* Martillazo: la nueva cae, recibe el golpe y tiembla */
-@keyframes martillazo {
-  0% { opacity: 0; transform: scale(1.06) translateY(-18px); }
-  40% { opacity: 1; transform: scale(1) translateY(0); }
-  48% { transform: scale(.97) translateY(6px); }
-  56% { transform: translate(-12px, 3px) rotate(-.6deg); }
-  64% { transform: translate(10px, -3px) rotate(.5deg); }
-  72% { transform: translate(-7px, 2px); }
-  80% { transform: translate(5px, -1px); }
-  90% { transform: translate(-2px, 0); }
+/* La página nueva es la cara de un martillo gigante: sube desde abajo cada vez más deprisa, llena la
+   pantalla al golpear (~750 ms) y tiembla. El bisel de acero (.cara) hace exactamente lo mismo */
+@keyframes cara {
+  0% { transform: translateY(75vh) scale(.22) rotate(-5deg); animation-timing-function: cubic-bezier(.55, 0, .9, .55); }
+  60% { transform: none; animation-timing-function: ease-out; }
+  64% { transform: translateY(8px) scale(.985); }
+  70% { transform: translate(-12px, 3px) rotate(-.5deg); }
+  76% { transform: translate(10px, -3px) rotate(.4deg); }
+  82% { transform: translate(-6px, 2px); }
+  90% { transform: translate(3px, 0); }
   100% { transform: none; }
 }
-/* El martillo sube desde abajo hacia la pantalla, la golpea (~800 ms) y se retira */
-@keyframes martillo {
-  0% { opacity: 0; transform: translate(-50%, -23%) translateY(60vh) scale(.35) rotate(-18deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
-  20% { opacity: 1; }
-  66% { transform: translate(-50%, -23%) scale(1.5) rotate(0deg); filter: blur(0) drop-shadow(0 20px 30px rgba(0, 0, 0, .7)); }
-  72% { transform: translate(-50%, -23%) scale(1.42) rotate(1deg); }
-  100% { opacity: 0; transform: translate(-50%, -23%) translateY(55vh) scale(.9) rotate(8deg); filter: blur(2px); }
-}
+/* El bisel y el mango desaparecen tras el golpe y queda solo la página */
+@keyframes soltar { 0%, 62% { opacity: 1; } 78%, 100% { opacity: 0; } }
 /* El cristal se raja de golpe y luego se desvanece */
 @keyframes grietas {
   0%, 38% { opacity: 0; }
@@ -281,26 +275,35 @@ td .puesto { font-size: 16px; }
     mask-size: 100% 260%;
     mask-repeat: no-repeat;
   }
-  /* El golpe cae a los ~800 ms: a la vez el martillo toca el cristal, se raja y la página tiembla */
-  ::view-transition-new(.martillazo) { animation: 720ms ease-out 510ms both martillazo; }
+  /* El golpe cae a los ~750 ms: la página llena la pantalla, el cristal se raja y todo tiembla */
+  ::view-transition-new(.martillazo) {
+    transform-origin: 50% calc(var(--cara-alto, 50vh) / 2);
+    animation: 1250ms both cara;
+  }
   :root:active-view-transition .golpe {
     display: block; position: fixed; inset: 0; z-index: 56; pointer-events: none;
     view-transition-name: golpe;
   }
-  .golpe .martillo {
-    position: absolute; left: 50%; top: 42vh; width: min(240px, 48vw); height: auto;
-    transform-origin: 50% 23%; /* el centro de la cabeza, que es donde golpea */
-    animation: 1220ms cubic-bezier(.55, 0, .45, 1) both martillo;
+  /* Bisel de acero alrededor de la parte visible de la página nueva: cuatro caras con la luz arriba a la izquierda */
+  .golpe .cara {
+    position: absolute; box-sizing: content-box;
+    left: calc(var(--cara-x, 0px) - 20px); top: calc(var(--cara-y, 0px) - 20px);
+    width: var(--cara-ancho, 100vw); height: var(--cara-alto, 60vh);
+    border: 20px solid; border-color: #eef0f2 #5f656d #3c4147 #b4bac1;
+    outline: 2px solid #1b1d20; border-radius: 4px;
+    box-shadow: 0 40px 80px rgba(0, 0, 0, .75), inset 0 0 0 2px rgba(0, 0, 0, .5);
+    animation: 1250ms both cara, 1250ms linear both soltar;
   }
+  .golpe .mango { position: absolute; left: 50%; top: calc(100% + 20px); width: 90px; height: auto; transform: translateX(-50%); }
   .golpe .grietas {
-    position: absolute; left: 50%; top: 42vh; width: min(1100px, 190vw); height: auto; transform: translate(-50%, -50%);
+    position: absolute; left: calc(var(--cara-x, 0px) + var(--cara-ancho, 100vw) / 2); top: calc(var(--cara-y, 0px) + var(--cara-alto, 84vh) / 2); width: min(1100px, 190vw); height: auto; transform: translate(-50%, -50%);
     fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: .7; stroke-linejoin: bevel;
     filter: drop-shadow(0 0 1.5px rgba(255, 180, 90, .9));
     animation: 1950ms linear both grietas;
   }
   .golpe .grietas path { stroke-dasharray: 1; animation: 1950ms ease-out both rajar; }
   .golpe .destello {
-    position: absolute; left: 50%; top: 42vh; width: 220px; height: 220px; border-radius: 50%;
+    position: absolute; left: calc(var(--cara-x, 0px) + var(--cara-ancho, 100vw) / 2); top: calc(var(--cara-y, 0px) + var(--cara-alto, 84vh) / 2); width: 220px; height: 220px; border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #ffd27a 25%, rgba(255, 77, 26, .6) 50%, transparent 70%);
     animation: 1950ms ease-out both destello;
   }
