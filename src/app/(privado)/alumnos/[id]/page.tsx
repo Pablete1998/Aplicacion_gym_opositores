@@ -17,6 +17,7 @@ export default async function FichaAlumno({ params, searchParams }: PageProps<"/
         <Link href="/alumnos" className="sub">← Alumnos</Link>
         <div className="row" style={{ justifyContent: "flex-end" }}>
           {perfil.rol === "direccion" && <Link href={`/alumnos/${id}/editar`} className="btn ghost">Editar</Link>}
+          <Link href={`/alumnos/${id}/informe`} className="btn ghost">Informe mensual</Link>
           <Link href={`/registrar?alumno=${id}`} className="btn">Registrar marca</Link>
         </div>
       </div>
