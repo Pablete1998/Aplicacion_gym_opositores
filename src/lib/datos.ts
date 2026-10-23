@@ -26,8 +26,8 @@ export const ROLES: Record<Rol, string> = {
 };
 
 export const INICIO: Record<Rol, string> = {
-  direccion: "/alumnos",
-  preparador: "/alumnos",
+  direccion: "/panel",
+  preparador: "/panel",
   alumno: "/mi",
   recepcion: "/acceso",
 };

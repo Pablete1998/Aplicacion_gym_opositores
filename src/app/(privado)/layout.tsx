@@ -1,17 +1,11 @@
 import Link from "next/link";
-import { perfilActual, type Rol } from "@/lib/datos";
+import { perfilActual } from "@/lib/datos";
 import { salir } from "@/app/login/actions";
 import { Logo } from "@/components/Logo";
+import { Menu } from "@/components/Menu";
 
 // Todo depende de la sesión del usuario: se renderiza en el servidor en cada petición
 export const instant = false;
-
-const MENU: Record<Rol, [string, string][]> = {
-  direccion: [["/alumnos", "Alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"], ["/informes", "Informes"], ["/acceso", "Acceso"], ["/cuotas", "Cuotas"], ["/oposiciones", "Oposiciones"], ["/personal", "Personal"]],
-  preparador: [["/alumnos", "Mis alumnos"], ["/registrar", "Registrar marca"], ["/simulacro", "Simulacros"], ["/informes", "Informes"]],
-  alumno: [["/mi", "Mi evolución"]],
-  recepcion: [["/acceso", "Acceso"]],
-};
 
 export default async function LayoutPrivado({ children }: { children: React.ReactNode }) {
   const perfil = await perfilActual();
@@ -23,13 +17,7 @@ export default async function LayoutPrivado({ children }: { children: React.Reac
             <Logo />
             Fer&apos;s Team
           </Link>
-          <nav className="nav">
-            {MENU[perfil.rol].map(([href, texto]) => (
-              <Link key={href} href={href}>
-                {texto}
-              </Link>
-            ))}
-          </nav>
+          <Menu rol={perfil.rol} />
           <div className="usuario">
             <Link href="/cuenta">{perfil.nombre}</Link>
             <form action={salir}>
