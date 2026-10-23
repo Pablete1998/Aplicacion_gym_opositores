@@ -16,6 +16,7 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | `/cuenta` | Todos | Cambiar la contraseña (obligatorio tras una provisional) |
 | `/acceso` | Recepción, dirección | Lector de QR: registra la entrada y la deniega si la cuota está pendiente |
 | `/mi` | Alumno | Su evolución, su QR de acceso y sus facturas |
+| `/rankings` | Todos menos recepción | La mejor marca de cada alumno en cada prueba, de toda la academia o por oposición, mujeres y hombres por separado, con el mote de cada uno si tiene |
 | `/facturas` | Dirección | Facturas de las cuotas (salen solas al marcar una cuota pagada), rectificativas, datos fiscales y CSV para el gestor por mes o trimestre |
 | `/facturas/[id]` | Dirección, el alumno | Factura para imprimir o guardar en PDF |
 
@@ -28,7 +29,7 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql`, `supabase/migrations/0007_testigo.sql` y `supabase/migrations/0008_facturas.sql`.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql`, `supabase/migrations/0007_testigo.sql`, `supabase/migrations/0008_facturas.sql` y `supabase/migrations/0009_rankings.sql`.
 3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
    La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.

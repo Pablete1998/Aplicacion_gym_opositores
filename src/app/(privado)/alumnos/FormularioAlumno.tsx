@@ -18,6 +18,7 @@ export interface ValoresAlumno {
   cuota_al_dia: boolean;
   activo: boolean;
   nif: string | null;
+  mote: string | null;
   domicilio: string | null;
   cuota_importe: number | null;
 }
@@ -75,6 +76,10 @@ export function FormularioAlumno({
       <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <input id="cuota_al_dia" name="cuota_al_dia" type="checkbox" defaultChecked={valores?.cuota_al_dia ?? true} style={{ width: "auto" }} />
         Cuota al día (si no, se le deniega la entrada)
+      </label>
+      <label>
+        Mote (sale en los rankings)
+        <input id="mote" name="mote" defaultValue={valores?.mote ?? ""} maxLength={30} autoComplete="off" placeholder="Opcional" />
       </label>
       <label>
         NIF (para factura completa)
