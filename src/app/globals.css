@@ -238,19 +238,26 @@ td .puesto { font-size: 16px; }
   90% { transform: translate(-2px, 0); }
   100% { transform: none; }
 }
-/* El martillo: aparece arriba, baja con fuerza, golpea y se va */
+/* El martillo viene desde el fondo hacia la pantalla, la golpea (~470 ms) y se retira */
 @keyframes martillo {
-  0% { opacity: 0; transform: rotate(10deg) translateY(-30px); }
-  25% { opacity: 1; transform: rotate(30deg); }
-  45% { transform: rotate(-92deg); }
-  52% { transform: rotate(-82deg); }
-  72% { opacity: 1; transform: rotate(-86deg); }
-  100% { opacity: 0; transform: rotate(-50deg) translateY(-20px); }
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(-30vh) scale(.15) rotate(-25deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
+  20% { opacity: 1; }
+  66% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); filter: blur(0) drop-shadow(0 20px 30px rgba(0, 0, 0, .7)); }
+  72% { transform: translate(-50%, -50%) scale(1.42) rotate(1deg); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(6vh) scale(.9) rotate(8deg); filter: blur(2px); }
 }
-@keyframes onda {
-  0%, 44% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
-  46% { opacity: 1; }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(4); }
+/* El cristal se raja de golpe y luego se desvanece */
+@keyframes grietas {
+  0%, 38% { opacity: 0; }
+  40% { opacity: 1; }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes rajar { 0%, 38% { stroke-dashoffset: 1; } 46%, 100% { stroke-dashoffset: 0; } }
+@keyframes destello {
+  0%, 38% { opacity: 0; transform: translate(-50%, -50%) scale(.3); }
+  41% { opacity: .9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.6); }
 }
 @keyframes llamarada {
   from { transform: translateY(40%); opacity: 1; }
@@ -265,25 +272,31 @@ td .puesto { font-size: 16px; }
     mask-size: 100% 260%;
     mask-repeat: no-repeat;
   }
-  /* El golpe cae a los ~470 ms: a la vez el martillo toca, salta la onda y la página tiembla */
+  /* El golpe cae a los ~470 ms: a la vez el martillo toca el cristal, se raja y la página tiembla */
   ::view-transition-new(.martillazo) { animation: 420ms ease-out 300ms both martillazo; }
   :root:active-view-transition .golpe {
     display: block; position: fixed; inset: 0; z-index: 56; pointer-events: none;
     view-transition-name: golpe;
   }
   .golpe .martillo {
-    --w: min(150px, 30vw);
-    position: absolute; left: calc(50% + var(--w) * .16); top: calc(38vh - var(--w) * .93); width: var(--w); height: auto;
-    transform-origin: 50% 93%;
-    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .6));
-    animation: 700ms cubic-bezier(.6, 0, .4, 1) both martillo;
+    position: absolute; left: 50%; top: 42vh; width: min(240px, 48vw); height: auto;
+    animation: 720ms cubic-bezier(.55, 0, .45, 1) both martillo;
   }
-  .golpe .onda {
-    position: absolute; left: 50%; top: 38vh; width: 120px; height: 120px; border-radius: 50%;
-    border: 6px solid #ffb547; box-shadow: 0 0 30px #ff4d1a, inset 0 0 20px #ff8a00;
-    animation: 700ms ease-out both onda;
+  .golpe .grietas {
+    position: absolute; left: 50%; top: 42vh; width: min(1100px, 190vw); height: auto; transform: translate(-50%, -50%);
+    fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: .7; stroke-linejoin: bevel;
+    filter: drop-shadow(0 0 1.5px rgba(255, 180, 90, .9));
+    animation: 1150ms linear both grietas;
+  }
+  .golpe .grietas path { stroke-dasharray: 1; animation: 1150ms ease-out both rajar; }
+  .golpe .destello {
+    position: absolute; left: 50%; top: 42vh; width: 220px; height: 220px; border-radius: 50%;
+    background: radial-gradient(circle, #fff 0%, #ffd27a 25%, rgba(255, 77, 26, .6) 50%, transparent 70%);
+    animation: 1150ms ease-out both destello;
   }
   ::view-transition-group(golpe), ::view-transition-new(golpe), ::view-transition-old(golpe) { animation: none; }
+  /* El golpe siempre por encima de las páginas, que si no tapan las grietas */
+  ::view-transition-group(golpe) { z-index: 3; }
   /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
   :root:active-view-transition .llamarada {
     display: block; position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 55; pointer-events: none;
@@ -298,6 +311,7 @@ td .puesto { font-size: 16px; }
     animation: 480ms cubic-bezier(.5, 0, .6, 1) both llamarada;
   }
   ::view-transition-group(llamarada), ::view-transition-new(llamarada), ::view-transition-old(llamarada) { animation: none; mix-blend-mode: screen; }
+  ::view-transition-group(llamarada) { z-index: 2; }
   ::view-transition-group(.pastilla) { animation-duration: 340ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }
 }
 @media (prefers-reduced-motion: reduce) {
