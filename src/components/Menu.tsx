@@ -69,7 +69,7 @@ function Cargando() {
 // La pastilla de la sección activa se desliza de una entrada a otra del menú
 function Pastilla({ activa }: { activa: boolean }) {
   return activa ? (
-    <ViewTransition name="menu-activo" share="deslizar" default="none">
+    <ViewTransition name="menu-activo" share="pastilla" default="none">
       <span className="pastilla" aria-hidden="true" />
     </ViewTransition>
   ) : null;
@@ -95,20 +95,12 @@ export function Menu({ rol }: { rol: Rol }) {
   const enBarra = sobran ? entradas.slice(0, EN_BARRA - 1) : entradas;
   const enMas = sobran ? entradas.slice(EN_BARRA - 1) : [];
   const cerrar = () => mas.current?.removeAttribute("open");
-  // Ir a una sección que está más a la derecha en el menú desliza hacia la izquierda, y al revés
-  const posicion = (href: string) => entradas.findIndex(([h]) => h === href);
-  const sentido = (href: string) => {
-    const desde = actual ? posicion(actual) : -1;
-    const hasta = posicion(href);
-    if (desde < 0 || hasta < 0 || desde === hasta) return undefined;
-    return [hasta > desde ? "ir-adelante" : "ir-atras"];
-  };
 
   return (
     <>
       <nav className="nav" aria-label="Menú">
         {entradas.map(([href, texto]) => (
-          <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
+          <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
             <Pastilla activa={activa(href)} />
             <span>{texto}</span>
             <Cargando />
@@ -119,7 +111,7 @@ export function Menu({ rol }: { rol: Rol }) {
       {entradas.length > 1 && (
         <nav className="barra-movil" aria-label="Menú">
           {enBarra.map(([href, texto, icono]) => (
-            <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
+            <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
               <Icono nombre={icono} />
               {texto}
               <Cargando />
@@ -133,7 +125,7 @@ export function Menu({ rol }: { rol: Rol }) {
               </summary>
               <div className="mas-hoja">
                 {enMas.map(([href, texto, icono]) => (
-                  <Link key={href} href={href} onClick={cerrar} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
+                  <Link key={href} href={href} onClick={cerrar} aria-current={activa(href) ? "page" : undefined}>
                     <Icono nombre={icono} />
                     {texto}
                     <Cargando />

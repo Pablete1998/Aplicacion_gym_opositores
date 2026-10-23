@@ -220,17 +220,50 @@ td .puesto { font-size: 16px; }
 .pagina { display: grid; gap: 18px; min-width: 0; }
 .cargando { position: fixed; top: 0; left: 0; right: 0; z-index: 60; height: 3px; background: var(--fuego); transform-origin: left; animation: cargar 1.6s cubic-bezier(.1, .7, .3, 1) both; box-shadow: 0 0 10px var(--signal); }
 @keyframes cargar { from { transform: scaleX(0); } to { transform: scaleX(.9); } }
-@keyframes desvanecer { from { opacity: 0; filter: blur(4px); } to { opacity: 1; filter: blur(0); } }
-@keyframes subir { from { transform: translateY(16px); } to { transform: translateY(0); } }
-@keyframes deslizar { from { transform: translateX(var(--desliz)); } to { transform: translateX(0); } }
+/* Arder: la página vieja se quema de abajo arriba, con un borde de brasas */
+@keyframes arder {
+  0% { mask-position: 0 0; filter: none; }
+  40% { filter: sepia(.6) saturate(3) hue-rotate(-25deg) brightness(1.15); }
+  100% { mask-position: 0 100%; filter: sepia(1) saturate(5) hue-rotate(-30deg) brightness(.6); opacity: 0; }
+}
+/* Martillazo: la nueva cae, golpea y tiembla */
+@keyframes martillazo {
+  0% { opacity: 0; transform: scale(1.08) translateY(-14px); }
+  45% { opacity: 1; transform: scale(.985) translateY(3px); }
+  56% { transform: translate(-5px, 1px) rotate(-.3deg); }
+  68% { transform: translate(4px, -1px) rotate(.2deg); }
+  80% { transform: translate(-2px, 0); }
+  100% { transform: none; }
+}
+@keyframes llamarada {
+  from { transform: translateY(40%); opacity: 1; }
+  80% { opacity: 1; }
+  to { transform: translateY(-110vh); opacity: 0; }
+}
+.llamarada { display: none; }
 @media (prefers-reduced-motion: no-preference) {
-  ::view-transition-old(.salir) { animation: 120ms ease-in both desvanecer reverse; }
-  ::view-transition-new(.entrar) { animation: 220ms ease-out 90ms both desvanecer, 360ms cubic-bezier(.2, .8, .2, 1) both subir; }
-  ::view-transition-old(.ir-adelante) { --desliz: -48px; animation: 140ms ease-in both desvanecer reverse, 300ms ease-in both deslizar reverse; }
-  ::view-transition-new(.ir-adelante) { --desliz: 48px; animation: 220ms ease-out 110ms both desvanecer, 380ms cubic-bezier(.2, .8, .2, 1) both deslizar; }
-  ::view-transition-old(.ir-atras) { --desliz: 48px; animation: 140ms ease-in both desvanecer reverse, 300ms ease-in both deslizar reverse; }
-  ::view-transition-new(.ir-atras) { --desliz: -48px; animation: 220ms ease-out 110ms both desvanecer, 380ms cubic-bezier(.2, .8, .2, 1) both deslizar; }
-  ::view-transition-group(.deslizar) { animation-duration: 340ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }
+  ::view-transition-old(.arder) {
+    animation: 380ms cubic-bezier(.5, 0, .7, .4) both arder;
+    mask-image: linear-gradient(to top, transparent 0 38%, #000 62%);
+    mask-size: 100% 260%;
+    mask-repeat: no-repeat;
+  }
+  ::view-transition-new(.martillazo) { animation: 360ms cubic-bezier(.3, 1.4, .5, 1) 300ms both martillazo; }
+  /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
+  :root:active-view-transition .llamarada {
+    display: block; position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 55; pointer-events: none;
+    view-transition-name: llamarada;
+    background:
+      radial-gradient(ellipse 30% 40% at 20% 60%, rgba(255, 200, 80, .9), transparent 70%),
+      radial-gradient(ellipse 25% 45% at 55% 55%, rgba(255, 120, 0, .95), transparent 70%),
+      radial-gradient(ellipse 30% 40% at 85% 62%, rgba(255, 60, 0, .9), transparent 70%),
+      linear-gradient(to top, transparent, rgba(255, 46, 0, .85) 30%, rgba(255, 138, 0, .7) 55%, transparent);
+    filter: blur(16px);
+    mix-blend-mode: screen;
+    animation: 480ms cubic-bezier(.5, 0, .6, 1) both llamarada;
+  }
+  ::view-transition-group(llamarada), ::view-transition-new(llamarada), ::view-transition-old(llamarada) { animation: none; mix-blend-mode: screen; }
+  ::view-transition-group(.pastilla) { animation-duration: 340ms; animation-timing-function: cubic-bezier(.3, 1.3, .5, 1); }
 }
 @media (prefers-reduced-motion: reduce) {
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
