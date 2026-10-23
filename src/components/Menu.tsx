@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useRef, ViewTransition } from "react";
 import type { Rol } from "@/lib/datos";
 
 type Icono = keyof typeof ICONOS;
@@ -60,6 +60,21 @@ const MENU: Record<Rol, Entrada[]> = {
 };
 const EN_BARRA = 5;
 
+// Mientras carga la sección pulsada, una barra de fuego arriba del todo
+function Cargando() {
+  const { pending } = useLinkStatus();
+  return pending ? <span className="cargando" aria-hidden="true" /> : null;
+}
+
+// La pastilla de la sección activa se desliza de una entrada a otra del menú
+function Pastilla({ activa }: { activa: boolean }) {
+  return activa ? (
+    <ViewTransition name="menu-activo" share="deslizar" default="none">
+      <span className="pastilla" aria-hidden="true" />
+    </ViewTransition>
+  ) : null;
+}
+
 function Icono({ nombre }: { nombre: Icono }) {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -80,13 +95,23 @@ export function Menu({ rol }: { rol: Rol }) {
   const enBarra = sobran ? entradas.slice(0, EN_BARRA - 1) : entradas;
   const enMas = sobran ? entradas.slice(EN_BARRA - 1) : [];
   const cerrar = () => mas.current?.removeAttribute("open");
+  // Ir a una sección que está más a la derecha en el menú desliza hacia la izquierda, y al revés
+  const posicion = (href: string) => entradas.findIndex(([h]) => h === href);
+  const sentido = (href: string) => {
+    const desde = actual ? posicion(actual) : -1;
+    const hasta = posicion(href);
+    if (desde < 0 || hasta < 0 || desde === hasta) return undefined;
+    return [hasta > desde ? "ir-adelante" : "ir-atras"];
+  };
 
   return (
     <>
       <nav className="nav" aria-label="Menú">
         {entradas.map(([href, texto]) => (
-          <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
-            {texto}
+          <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
+            <Pastilla activa={activa(href)} />
+            <span>{texto}</span>
+            <Cargando />
           </Link>
         ))}
       </nav>
@@ -94,9 +119,10 @@ export function Menu({ rol }: { rol: Rol }) {
       {entradas.length > 1 && (
         <nav className="barra-movil" aria-label="Menú">
           {enBarra.map(([href, texto, icono]) => (
-            <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
+            <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
               <Icono nombre={icono} />
               {texto}
+              <Cargando />
             </Link>
           ))}
           {sobran && (
@@ -107,9 +133,10 @@ export function Menu({ rol }: { rol: Rol }) {
               </summary>
               <div className="mas-hoja">
                 {enMas.map(([href, texto, icono]) => (
-                  <Link key={href} href={href} onClick={cerrar} aria-current={activa(href) ? "page" : undefined}>
+                  <Link key={href} href={href} onClick={cerrar} aria-current={activa(href) ? "page" : undefined} transitionTypes={sentido(href)}>
                     <Icono nombre={icono} />
                     {texto}
+                    <Cargando />
                   </Link>
                 ))}
                 <Link href="/cuenta" onClick={cerrar} aria-current={activa("/cuenta") ? "page" : undefined}>
