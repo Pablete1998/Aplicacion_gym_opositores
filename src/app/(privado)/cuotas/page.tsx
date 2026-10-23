@@ -62,7 +62,7 @@ export default async function Cuotas() {
         </form>
       </section>
 
-      <section className="panel">
+      <section className="panel" id="entradas">
         <h2>Últimas entradas</h2>
         <div className="tbl">
           <table>
