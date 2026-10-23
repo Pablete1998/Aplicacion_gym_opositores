@@ -5,6 +5,7 @@ import { exigirRol, ROLES, type Rol } from "@/lib/datos";
 import { passwordProvisional } from "@/lib/password";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 
 export type Credenciales = { ok: true; email: string; password: string } | { ok: false; error: string } | null;
 
@@ -24,7 +25,7 @@ export async function crearAcceso(_prev: Credenciales, form: FormData): Promise<
   const alumnoId = String(form.get("alumno_id") ?? "");
   if (!nombre || !email.includes("@")) return { ok: false, error: "Escribe el nombre y un correo válido." };
   if (!esRol(rol)) return { ok: false, error: "Elige un rol." };
-  if (rol === "alumno" && !alumnoId) return { ok: false, error: "Elige qué ficha de alumno corresponde a esta persona." };
+  if (rol === "alumno" && !esUuid(alumnoId)) return { ok: false, error: "Elige qué ficha de alumno corresponde a esta persona." };
 
   const password = passwordProvisional();
   const admin = createAdminClient();
@@ -57,7 +58,7 @@ export async function cambiarRol(form: FormData) {
   const yo = await exigirRol("direccion");
   const id = String(form.get("id") ?? "");
   const rol = String(form.get("rol") ?? "");
-  if (id === yo.id || !esRol(rol)) return;
+  if (!esUuid(id) || id === yo.id || !esRol(rol)) return;
   const supabase = await createClient();
   await supabase.from("perfiles").update({ rol }).eq("id", id);
   revalidatePath("/personal");
@@ -66,7 +67,7 @@ export async function cambiarRol(form: FormData) {
 export async function cambiarAcceso(form: FormData) {
   const yo = await exigirRol("direccion");
   const id = String(form.get("id") ?? "");
-  if (id === yo.id) return;
+  if (!esUuid(id) || id === yo.id) return;
   const activar = form.get("activar") === "si";
   const admin = createAdminClient();
   // Un bloqueo de 100 años equivale a quitar el acceso sin borrar el historial
@@ -78,6 +79,7 @@ export async function asignarPreparador(form: FormData) {
   await exigirRol("direccion");
   const grupoId = String(form.get("grupo_id") ?? "");
   const preparadorId = String(form.get("preparador_id") ?? "") || null;
+  if (!esUuid(grupoId) || (preparadorId && !esUuid(preparadorId))) return;
   const supabase = await createClient();
   await supabase.from("grupos").update({ preparador_id: preparadorId }).eq("id", grupoId);
   revalidatePath("/personal");

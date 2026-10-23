@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 
 const volver = (form: FormData, extra: string) => {
   const periodo = String(form.get("periodo") ?? "");
@@ -46,7 +47,9 @@ export async function guardarDatos(form: FormData) {
 export async function emitir(form: FormData) {
   await exigirRol("direccion");
   const supabase = await createClient();
-  const { error } = await supabase.rpc("emitir_factura", { p_pago: String(form.get("pago") ?? "") });
+  const pago = String(form.get("pago") ?? "");
+  if (!esUuid(pago)) redirect(volver(form, "error=Factura+no+encontrada"));
+  const { error } = await supabase.rpc("emitir_factura", { p_pago: pago });
   revalidatePath("/facturas");
   revalidatePath("/cuotas");
   redirect(volver(form, error ? "error=" + encodeURIComponent(error.message) : "emitida=1"));
@@ -58,6 +61,7 @@ export async function rectificar(form: FormData) {
   await exigirRol("direccion");
   if (form.get("confirmo") !== "on") return;
   const id = String(form.get("id") ?? "");
+  if (!esUuid(id)) redirect(volver(form, "error=Factura+no+encontrada"));
   const supabase = await createClient();
   const { error } = await supabase.rpc("rectificar_factura", { p_factura: id, p_motivo: String(form.get("motivo") ?? "") });
   let fallo = error?.message;

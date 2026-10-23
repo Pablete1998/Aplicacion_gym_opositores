@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { baremoAplicable, edadEn, ETIQUETA_ESTADO, estadoMarca, formatoMarca, puntosMarca, type Baremo, type BaremoFila, type Unidad } from "@/lib/baremo";
 import { exigirRol, uno } from "@/lib/datos";
+import { hoyEnEspana } from "@/lib/sesiones";
 import { clasificar, mejorMarca } from "@/lib/simulacro";
 import { createClient } from "@/lib/supabase/server";
 import { Hoja, type Pendiente } from "./Hoja";
@@ -10,7 +11,7 @@ const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v :
 export default async function Simulacro({ searchParams }: PageProps<"/simulacro">) {
   const perfil = await exigirRol("direccion", "preparador");
   const sp = await searchParams;
-  const hoy = new Date().toISOString().slice(0, 10);
+  const hoy = hoyEnEspana();
   const fecha = /^\d{4}-\d{2}-\d{2}$/.test(texto(sp.fecha) ?? "") ? texto(sp.fecha)! : hoy;
   const supabase = await createClient();
 

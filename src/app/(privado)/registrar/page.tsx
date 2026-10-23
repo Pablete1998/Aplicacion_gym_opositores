@@ -1,4 +1,5 @@
 import { exigirRol, uno } from "@/lib/datos";
+import { hoyEnEspana } from "@/lib/sesiones";
 import { createClient } from "@/lib/supabase/server";
 import { Formulario, type Opcion } from "./Formulario";
 
@@ -30,7 +31,7 @@ export default async function Registrar({ searchParams }: PageProps<"/registrar"
       </div>
       <section className="panel">
         {alumnos.length ? (
-          <Formulario alumnos={alumnos} inicial={typeof alumno === "string" ? alumno : undefined} hoy={new Date().toISOString().slice(0, 10)} />
+          <Formulario alumnos={alumnos} inicial={typeof alumno === "string" ? alumno : undefined} hoy={hoyEnEspana()} />
         ) : (
           <p className="sub">No tienes alumnos asignados.</p>
         )}

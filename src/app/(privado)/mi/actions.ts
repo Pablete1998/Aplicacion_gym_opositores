@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { leerMarca } from "@/lib/baremo";
 import { exigirRol, miAlumnoId } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 import { esClaveToque } from "@/lib/toques";
 
 export type Respuesta = { ok: boolean; mensaje: string } | null;
@@ -13,7 +14,7 @@ export async function darToque(_prev: Respuesta, form: FormData): Promise<Respue
   await exigirRol("alumno");
   const para = String(form.get("para") ?? "");
   const mensaje = String(form.get("mensaje") ?? "");
-  if (!para || !esClaveToque(mensaje)) return { ok: false, mensaje: "Elige un mensaje." };
+  if (!esUuid(para) || !esClaveToque(mensaje)) return { ok: false, mensaje: "Elige un mensaje." };
   const supabase = await createClient();
   const { error } = await supabase.rpc("dar_toque", { p_para: para, p_mensaje: mensaje });
   // Los motivos de rechazo (ya le diste uno hoy, no es de tu grupo…) vienen escritos desde la base de datos
@@ -34,6 +35,7 @@ export async function marcarToquesLeidos() {
 export async function empezarSesion(_prev: Respuesta, form: FormData): Promise<Respuesta> {
   await exigirRol("alumno");
   const plan = String(form.get("plan") ?? "");
+  if (!esUuid(plan)) return { ok: false, mensaje: "No se pudo empezar la sesión." };
   const supabase = await createClient();
   const { error } = await supabase.rpc("empezar_sesion", { p_plan: plan });
   if (error) return { ok: false, mensaje: error.message || "No se pudo empezar la sesión." };
@@ -45,7 +47,8 @@ export async function empezarSesion(_prev: Respuesta, form: FormData): Promise<R
 export async function guardarSesion(_prev: Respuesta, form: FormData): Promise<Respuesta> {
   await exigirRol("alumno");
   const sesion = String(form.get("sesion") ?? "");
-  const ejercicios = form.getAll("ejercicio").map(String);
+  const ejercicios = form.getAll("ejercicio").map(String).filter(esUuid);
+  if (!esUuid(sesion)) return { ok: false, mensaje: "No se pudo guardar." };
   const filas: { sesion_id: string; ejercicio_id: string; valor: number | null; hecho: boolean }[] = [];
   for (const id of ejercicios) {
     const texto = String(form.get(`v_${id}`) ?? "").trim();

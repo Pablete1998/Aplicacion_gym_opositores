@@ -5,6 +5,7 @@ import { exigirRol } from "@/lib/datos";
 import { mesActual } from "@/lib/informes";
 import { createClient } from "@/lib/supabase/server";
 import { esFormaPago } from "@/lib/pagos";
+import { esUuid } from "@/lib/texto";
 
 function refrescar() {
   revalidatePath("/cuotas");
@@ -18,7 +19,7 @@ export async function marcarPagada(form: FormData) {
   await exigirRol("direccion");
   const id = String(form.get("id") ?? "");
   const forma = String(form.get("forma") ?? "");
-  if (!esFormaPago(forma)) return;
+  if (!esUuid(id) || !esFormaPago(forma)) return;
   const supabase = await createClient();
   // Importe: el del alumno si paga distinto, si no el precio general (IVA incluido). Regalada: 0.
   const [{ data: alumno }, { data: datos }] = await Promise.all([
@@ -41,6 +42,7 @@ export async function marcarPagada(form: FormData) {
 export async function marcarPendiente(form: FormData) {
   await exigirRol("direccion");
   const id = String(form.get("id") ?? "");
+  if (!esUuid(id)) return;
   const supabase = await createClient();
   await supabase.from("alumnos").update({ cuota_al_dia: false }).eq("id", id);
   // Si ya tenía factura, no se borra: se anula con una rectificativa
