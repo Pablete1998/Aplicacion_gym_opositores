@@ -240,11 +240,11 @@ td .puesto { font-size: 16px; }
 }
 /* El martillo sube desde abajo hacia la pantalla, la golpea (~470 ms) y se retira */
 @keyframes martillo {
-  0% { opacity: 0; transform: translate(-50%, -50%) translateY(60vh) scale(.35) rotate(-18deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
+  0% { opacity: 0; transform: translate(-50%, -23%) translateY(60vh) scale(.35) rotate(-18deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
   20% { opacity: 1; }
-  66% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); filter: blur(0) drop-shadow(0 20px 30px rgba(0, 0, 0, .7)); }
-  72% { transform: translate(-50%, -50%) scale(1.42) rotate(1deg); }
-  100% { opacity: 0; transform: translate(-50%, -50%) translateY(55vh) scale(.9) rotate(8deg); filter: blur(2px); }
+  66% { transform: translate(-50%, -23%) scale(1.5) rotate(0deg); filter: blur(0) drop-shadow(0 20px 30px rgba(0, 0, 0, .7)); }
+  72% { transform: translate(-50%, -23%) scale(1.42) rotate(1deg); }
+  100% { opacity: 0; transform: translate(-50%, -23%) translateY(55vh) scale(.9) rotate(8deg); filter: blur(2px); }
 }
 /* El cristal se raja de golpe y luego se desvanece */
 @keyframes grietas {
@@ -280,6 +280,7 @@ td .puesto { font-size: 16px; }
   }
   .golpe .martillo {
     position: absolute; left: 50%; top: 42vh; width: min(240px, 48vw); height: auto;
+    transform-origin: 50% 23%; /* el centro de la cabeza, que es donde golpea */
     animation: 720ms cubic-bezier(.55, 0, .45, 1) both martillo;
   }
   .golpe .grietas {
