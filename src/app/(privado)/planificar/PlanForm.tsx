@@ -1,17 +1,20 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { UNIDADES_EJERCICIO } from "@/lib/sesiones";
+import { UNIDAD_DE_PRUEBA, UNIDADES_EJERCICIO, type PruebaOficial } from "@/lib/sesiones";
 import { guardarPlan } from "./actions";
 
-export interface EjercicioPlan { id: string | null; nombre: string; pauta: string; unidad: string }
+export interface EjercicioPlan { id: string | null; nombre: string; pauta: string; unidad: string; prueba: string }
 
 let siguiente = 0;
-const vacio = (): EjercicioPlan & { clave: string } => ({ id: null, nombre: "", pauta: "", unidad: "", clave: `n${siguiente++}` });
+const vacio = (): EjercicioPlan & { clave: string } => ({ id: null, nombre: "", pauta: "", unidad: "", prueba: "", clave: `n${siguiente++}` });
 
-export function PlanForm({ grupo, fecha, titulo, notas, ejercicios }: { grupo: string; fecha: string; titulo: string; notas: string; ejercicios: EjercicioPlan[] }) {
+export function PlanForm({ grupo, fecha, titulo, notas, ejercicios, pruebas }: { grupo: string; fecha: string; titulo: string; notas: string; ejercicios: EjercicioPlan[]; pruebas: PruebaOficial[] }) {
   const [estado, accion, enviando] = useActionState(guardarPlan, null);
   const [filas, setFilas] = useState(() => (ejercicios.length ? ejercicios.map((e) => ({ ...e, clave: e.id ?? `n${siguiente++}` })) : [vacio()]));
+
+  const cambiar = (clave: string, cambios: Partial<EjercicioPlan>) => setFilas((f) => f.map((x) => (x.clave === clave ? { ...x, ...cambios } : x)));
+  const unidadDe = (prueba: string) => UNIDAD_DE_PRUEBA[pruebas.find((p) => p.id === prueba)?.unidad ?? ""] ?? "";
 
   const mover = (i: number, paso: number) =>
     setFilas((f) => {
@@ -48,8 +51,16 @@ export function PlanForm({ grupo, fecha, titulo, notas, ejercicios }: { grupo: s
               <input name="ej_pauta" defaultValue={e.pauta} placeholder="Ej. 4 series al máximo" />
             </label>
             <label>
+              Prueba oficial
+              <select name="ej_prueba" value={e.prueba} onChange={(ev) => cambiar(e.clave, { prueba: ev.target.value, unidad: unidadDe(ev.target.value) || e.unidad })}>
+                <option value="">No</option>
+                {pruebas.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+              </select>
+            </label>
+            <label>
               El alumno apunta
-              <select name="ej_unidad" defaultValue={e.unidad}>
+              {e.prueba && <input type="hidden" name="ej_unidad" value={unidadDe(e.prueba)} />}
+              <select name={e.prueba ? undefined : "ej_unidad"} value={e.prueba ? unidadDe(e.prueba) : e.unidad} disabled={Boolean(e.prueba)} onChange={(ev) => cambiar(e.clave, { unidad: ev.target.value })}>
                 <option value="">Solo si lo ha hecho</option>
                 {Object.entries(UNIDADES_EJERCICIO).map(([valor, texto]) => <option key={valor} value={valor}>{texto}</option>)}
               </select>
