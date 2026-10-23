@@ -8,6 +8,8 @@ export const ETIQUETA_TENDENCIA: Record<Tendencia, string> = {
   empeora: "Empeora",
 };
 
+import { hoyEnEspana } from "./sesiones.ts";
+
 type Marca = { fecha: string; marca: number };
 
 function restarDias(fecha: string, dias: number): string {
@@ -31,13 +33,13 @@ export function tendencia(serie: Marca[], mayorEsMejor: boolean, semanas = 4): T
   return "estable";
 }
 
-export function diasDesde(fecha: string, hoy = new Date()): number {
-  return Math.floor((hoy.getTime() - new Date(fecha + "T12:00Z").getTime()) / 864e5);
+// Fecha de hace unos días en España ("2026-10-02")
+export function haceDias(dias: number, ahora = new Date()): string {
+  return restarDias(hoyEnEspana(ahora), dias);
 }
 
-// Meses en formato "2026-10"
-export function mesDe(fecha: Date): string {
-  return fecha.toISOString().slice(0, 7);
+export function diasDesde(fecha: string, hoy = new Date()): number {
+  return Math.floor((hoy.getTime() - new Date(fecha + "T12:00Z").getTime()) / 864e5);
 }
 
 // Mes en curso en España ("2026-10"), aunque el servidor vaya en UTC

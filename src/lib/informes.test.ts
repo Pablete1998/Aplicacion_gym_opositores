@@ -1,6 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { diasDesde, enMes, mejorDe, mesActual, mesAnterior, mesSiguiente, nombreMes, tendencia } from "./informes.ts";
+import { diasDesde, enMes, haceDias, mejorDe, mesActual, mesAnterior, mesSiguiente, nombreMes, tendencia } from "./informes.ts";
 
 test("tendencia en tiempos: bajar es mejorar", () => {
   const serie = [
@@ -46,4 +46,11 @@ test("mes en curso en hora de España", () => {
   // 31 de octubre a las 23:30 UTC ya es 1 de noviembre en Madrid
   assert.equal(mesActual(new Date("2026-10-31T23:30:00Z")), "2026-11");
   assert.equal(mesActual(new Date("2026-10-15T10:00:00Z")), "2026-10");
+});
+
+test("haceDias cuenta en hora española", () => {
+  // A las 23:30 UTC del 1 de octubre ya es 2 de octubre en Madrid
+  const noche = new Date("2026-10-01T23:30:00Z");
+  assert.equal(haceDias(0, noche), "2026-10-02");
+  assert.equal(haceDias(7, noche), "2026-09-25");
 });

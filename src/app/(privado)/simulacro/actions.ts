@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { leerMarca } from "@/lib/baremo";
 import { exigirRol } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 
 export type Respuesta = { ok: boolean; mensaje: string } | null;
 
@@ -14,12 +15,12 @@ export async function guardarSimulacro(_prev: Respuesta, form: FormData): Promis
   const grupoId = String(form.get("grupo") ?? "");
   const pruebaId = String(form.get("prueba") ?? "");
   const fecha = String(form.get("fecha") ?? "");
-  if (!grupoId || !pruebaId || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, mensaje: "Elige grupo, prueba y fecha." };
+  if (!esUuid(grupoId) || !esUuid(pruebaId) || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, mensaje: "Elige grupo, prueba y fecha." };
 
   const filas: { alumno_id: string; prueba_id: string; fecha: string; marca: number }[] = [];
   const malas: string[] = [];
   for (const [clave, valor] of form) {
-    if (!clave.startsWith("m_") || typeof valor !== "string" || !valor.trim()) continue;
+    if (!clave.startsWith("m_") || !esUuid(clave.slice(2)) || typeof valor !== "string" || !valor.trim()) continue;
     const marca = leerMarca(valor);
     if (marca === null) malas.push(valor.trim());
     else filas.push({ alumno_id: clave.slice(2), prueba_id: pruebaId, fecha, marca });

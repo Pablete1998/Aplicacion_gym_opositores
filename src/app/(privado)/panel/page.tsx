@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { exigirRol, listarAlumnos, uno } from "@/lib/datos";
+import { haceDias } from "@/lib/informes";
 import { createClient } from "@/lib/supabase/server";
 
 // Igual que en Informes: sin marcas en este tiempo, el alumno necesita atención
@@ -16,10 +17,6 @@ function inicioDeHoy(): string {
     .find((p) => p.type === "timeZoneName")
     ?.value.replace("GMT", "");
   return `${fecha}T00:00:00${desfase || "+00:00"}`;
-}
-
-function haceDias(dias: number): string {
-  return new Date(Date.now() - dias * 86_400_000).toISOString().slice(0, 10);
 }
 
 export default async function Panel() {

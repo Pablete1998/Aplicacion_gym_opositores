@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatoMarca } from "@/lib/baremo";
 import { exigirRol, miAlumnoId, uno } from "@/lib/datos";
+import { haceDias } from "@/lib/informes";
 import { agruparRanking, type Ejercicio, type MarcaRanking, type PruebaRanking } from "@/lib/ranking";
 import { createClient } from "@/lib/supabase/server";
 import { ponerMote } from "./actions";
@@ -10,7 +11,6 @@ type Periodo = keyof typeof PERIODOS;
 const MEDALLA = ["🥇", "🥈", "🥉"];
 const EN_RESUMEN = 3;
 
-const haceDias = (n: number) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
 const FECHA = (f: string) => f.split("-").reverse().join("/");
 
 function Puesto({ puesto }: { puesto: number }) {

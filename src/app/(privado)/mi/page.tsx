@@ -5,7 +5,7 @@ import { Instalar } from "@/components/Instalar";
 import { formatoMarca, siguienteMeta, type Unidad } from "@/lib/baremo";
 import { euros, numeroFactura } from "@/lib/facturas";
 import { cargarFicha, diasDeAsistencia, exigirRol, miAlumnoId } from "@/lib/datos";
-import { ETIQUETA_TENDENCIA, mesDe, type Tendencia } from "@/lib/informes";
+import { ETIQUETA_TENDENCIA, haceDias, mesActual, type Tendencia } from "@/lib/informes";
 import { hoyEnEspana } from "@/lib/sesiones";
 import { clasificar } from "@/lib/simulacro";
 import { createClient } from "@/lib/supabase/server";
@@ -22,8 +22,6 @@ const FLECHA: Record<Tendencia, string> = { mejora: "↑", estable: "→", empeo
 interface FilaRanking { prueba_id: string; alumno_id: string; nombre: string; marca: number | null; marca_anterior: number | null; soy_yo: boolean }
 interface ToqueRecibido { id: string; de: string; mensaje: string; creado_en: string }
 
-const haceDias = (n: number) => new Date(Date.now() - n * 864e5).toISOString().slice(0, 10);
-
 export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
   await exigirRol("alumno");
   const { prueba, ranking: rankingParam } = await searchParams;
@@ -34,7 +32,7 @@ export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
   const supabase = await createClient();
   const [qr, dias, { data: toquesDatos }, { data: rankingDatos }, { data: planHoy }, { data: facturas }] = await Promise.all([
     QRCode.toString(ficha.codigo_acceso, { type: "svg", margin: 1 }),
-    diasDeAsistencia(id, mesDe(new Date())),
+    diasDeAsistencia(id, mesActual()),
     supabase.rpc("mis_toques"),
     supabase.rpc("ranking_mi_grupo", { p_desde: haceDias(DIAS_RANKING), p_antes: haceDias(DIAS_RANKING * 2) }),
     // Plan de hoy de su grupo (RLS) y si ya ha empezado o terminado la sesión

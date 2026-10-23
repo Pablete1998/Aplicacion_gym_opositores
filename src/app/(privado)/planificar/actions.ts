@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
 import { esUnidadEjercicio, UNIDAD_DE_PRUEBA } from "@/lib/sesiones";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 
 export type Respuesta = { ok: boolean; mensaje: string } | null;
 
@@ -18,14 +19,14 @@ export async function guardarPlan(_prev: Respuesta, form: FormData): Promise<Res
   const fecha = String(form.get("fecha") ?? "");
   const titulo = String(form.get("titulo") ?? "").trim();
   const notas = String(form.get("notas") ?? "").trim() || null;
-  if (!grupo || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, mensaje: "Falta el grupo o la fecha." };
+  if (!esUuid(grupo) || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, mensaje: "Falta el grupo o la fecha." };
   if (!titulo) return { ok: false, mensaje: "Ponle un título a la sesión." };
 
-  const ids = form.getAll("ej_id").map(String);
+  const ids = form.getAll("ej_id").map((v) => (esUuid(String(v)) ? String(v) : ""));
   const nombres = form.getAll("ej_nombre").map((v) => String(v).trim());
   const pautas = form.getAll("ej_pauta").map((v) => String(v).trim());
   const unidades = form.getAll("ej_unidad").map(String);
-  const pruebasElegidas = form.getAll("ej_prueba").map(String);
+  const pruebasElegidas = form.getAll("ej_prueba").map((v) => (esUuid(String(v)) ? String(v) : ""));
   const supabase = await createClient();
   // La unidad de un ejercicio que es prueba oficial es la de la prueba, diga lo que diga el formulario
   const { data: pruebas } = pruebasElegidas.some(Boolean)
@@ -69,6 +70,7 @@ export async function copiarUltimo(form: FormData) {
   await exigirRol("direccion", "preparador");
   const grupo = String(form.get("grupo") ?? "");
   const fecha = String(form.get("fecha") ?? "");
+  if (!esUuid(grupo) || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) redirect("/planificar");
   const supabase = await createClient();
   const { data: ultimo } = await supabase
     .from("planes")
@@ -92,6 +94,7 @@ export async function borrarPlan(form: FormData) {
   await exigirRol("direccion", "preparador");
   const grupo = String(form.get("grupo") ?? "");
   const fecha = String(form.get("fecha") ?? "");
+  if (!esUuid(grupo) || !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) redirect("/planificar");
   if (form.get("confirmo") !== "on") redirect(volver(grupo, fecha));
   const supabase = await createClient();
   await supabase.from("planes").delete().eq("grupo_id", grupo).eq("fecha", fecha);
@@ -103,13 +106,15 @@ export async function borrarPlan(form: FormData) {
 export async function validarMarca(form: FormData) {
   await exigirRol("direccion", "preparador");
   const supabase = await createClient();
-  await supabase.rpc("validar_marca", { p_marca: String(form.get("marca") ?? "") });
+  const marca = String(form.get("marca") ?? "");
+  if (esUuid(marca)) await supabase.rpc("validar_marca", { p_marca: marca });
   revalidatePath("/planificar");
 }
 
 export async function anularValidacion(form: FormData) {
   await exigirRol("direccion", "preparador");
   const supabase = await createClient();
-  await supabase.rpc("anular_validacion", { p_marca: String(form.get("marca") ?? "") });
+  const marca = String(form.get("marca") ?? "");
+  if (esUuid(marca)) await supabase.rpc("anular_validacion", { p_marca: marca });
   revalidatePath("/planificar");
 }

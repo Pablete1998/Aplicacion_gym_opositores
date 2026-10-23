@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { leerMarca } from "@/lib/baremo";
 import { exigirRol } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
+import { esUuid } from "@/lib/texto";
 
 export type Respuesta = { ok: boolean; mensaje: string } | null;
 
@@ -13,7 +14,8 @@ export async function registrarMarca(_prev: Respuesta, form: FormData): Promise<
   const pruebaId = String(form.get("prueba") ?? "");
   const fecha = String(form.get("fecha") ?? "");
   const marca = leerMarca(String(form.get("marca") ?? ""));
-  if (!alumnoId || !pruebaId) return { ok: false, mensaje: "Elige alumno y prueba." };
+  if (!esUuid(alumnoId) || !esUuid(pruebaId)) return { ok: false, mensaje: "Elige alumno y prueba." };
+  if (fecha && !/^\d{4}-\d{2}-\d{2}$/.test(fecha)) return { ok: false, mensaje: "La fecha no es válida." };
   if (marca === null) return { ok: false, mensaje: "Escribe la marca como número, por ejemplo 11,4, 8 o 3:45." };
 
   const supabase = await createClient();
