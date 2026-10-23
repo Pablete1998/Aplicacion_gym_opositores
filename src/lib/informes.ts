@@ -40,6 +40,11 @@ export function mesDe(fecha: Date): string {
   return fecha.toISOString().slice(0, 7);
 }
 
+// Mes en curso en España ("2026-10"), aunque el servidor vaya en UTC
+export function mesActual(ahora = new Date()): string {
+  return ahora.toLocaleDateString("sv-SE", { timeZone: "Europe/Madrid" }).slice(0, 7);
+}
+
 export function mesAnterior(mes: string): string {
   const [a, m] = mes.split("-").map(Number);
   return m === 1 ? `${a - 1}-12` : `${a}-${String(m - 1).padStart(2, "0")}`;

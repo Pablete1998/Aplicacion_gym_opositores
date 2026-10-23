@@ -1,20 +1,33 @@
-import Link from "next/link";
 import { exigirRol, listarAlumnos, uno } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
-import { cambiarCuota, marcarTodasPendientes } from "./actions";
+import { mesActual, nombreMes } from "@/lib/informes";
+import { FORMAS_PAGO, type FormaPago } from "@/lib/pagos";
+import { marcarTodasPendientes } from "./actions";
+import { Tabla, type FilaCuota } from "./Tabla";
 
 const HORA = new Intl.DateTimeFormat("es-ES", { dateStyle: "short", timeStyle: "short", timeZone: "Europe/Madrid" });
 
 export default async function Cuotas() {
   await exigirRol("direccion");
   const supabase = await createClient();
-  const [alumnos, { data: accesos }] = await Promise.all([
+  const mes = mesActual();
+  const [alumnos, { data: accesos }, { data: pagos }] = await Promise.all([
     listarAlumnos(),
     supabase.from("accesos").select("id, momento, permitido, motivo, alumnos(nombre, apellidos)").order("momento", { ascending: false }).limit(30),
+    supabase.from("pagos").select("alumno_id, forma").eq("mes", mes),
   ]);
+  const formaDe = new Map((pagos ?? []).map((p) => [p.alumno_id, p.forma as FormaPago]));
+  // Cuántos han pagado este mes de cada forma
+  const porForma = Object.entries(FORMAS_PAGO).map(([forma, nombre]) => ({
+    nombre,
+    cuantos: (pagos ?? []).filter((p) => p.forma === forma).length,
+  }));
   const pendientes = alumnos.filter((a) => !a.cuota_al_dia);
   // Primero los pendientes, que son los que hay que cobrar
-  const ordenados = [...pendientes, ...alumnos.filter((a) => a.cuota_al_dia)];
+  const ordenados: FilaCuota[] = [...pendientes, ...alumnos.filter((a) => a.cuota_al_dia)].map((a) => ({
+    ...a,
+    forma: (a.cuota_al_dia && formaDe.get(a.id)) || null,
+  }));
 
   return (
     <>
@@ -27,28 +40,10 @@ export default async function Cuotas() {
 
       <section className="panel">
         <h2>Cuota de cada alumno</h2>
-        <div className="tbl">
-          <table>
-            <thead><tr><th>Alumno</th><th>Grupo</th><th>Cuota</th></tr></thead>
-            <tbody>
-              {ordenados.map((a) => (
-                <tr key={a.id}>
-                  <td><Link href={`/alumnos/${a.id}`}>{a.apellidos}, {a.nombre}</Link></td>
-                  <td>{a.grupo ?? "Sin grupo"}</td>
-                  <td>
-                    <form action={cambiarCuota}>
-                      <input type="hidden" name="id" value={a.id} />
-                      <input type="hidden" name="al_dia" value={a.cuota_al_dia ? "no" : "si"} />
-                      {a.cuota_al_dia ? <span className="pill p-objetivo">Al día</span> : <span className="pill p-no_apto">Pendiente</span>}{" "}
-                      <button className="btn ghost">{a.cuota_al_dia ? "Marcar pendiente" : "Marcar pagada"}</button>
-                    </form>
-                  </td>
-                </tr>
-              ))}
-              {alumnos.length === 0 && <tr><td colSpan={3}>No hay alumnos todavía.</td></tr>}
-            </tbody>
-          </table>
-        </div>
+        <p className="sub">
+          {nombreMes(mes).charAt(0).toUpperCase() + nombreMes(mes).slice(1)}: {porForma.map((f) => `${f.cuantos} ${f.nombre.toLowerCase()}`).join(", ")}.
+        </p>
+        <Tabla filas={ordenados} />
       </section>
 
       <section className="panel">
