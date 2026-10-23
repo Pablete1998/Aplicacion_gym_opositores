@@ -226,21 +226,38 @@ td .puesto { font-size: 16px; }
   40% { filter: sepia(.6) saturate(3) hue-rotate(-25deg) brightness(1.15); }
   100% { mask-position: 0 100%; filter: sepia(1) saturate(5) hue-rotate(-30deg) brightness(.6); opacity: 0; }
 }
-/* Martillazo: la nueva cae, golpea y tiembla */
+/* Martillazo: la nueva cae, recibe el golpe y tiembla */
 @keyframes martillazo {
-  0% { opacity: 0; transform: scale(1.08) translateY(-14px); }
-  45% { opacity: 1; transform: scale(.985) translateY(3px); }
-  56% { transform: translate(-5px, 1px) rotate(-.3deg); }
-  68% { transform: translate(4px, -1px) rotate(.2deg); }
-  80% { transform: translate(-2px, 0); }
+  0% { opacity: 0; transform: scale(1.06) translateY(-18px); }
+  40% { opacity: 1; transform: scale(1) translateY(0); }
+  48% { transform: scale(.97) translateY(6px); }
+  56% { transform: translate(-12px, 3px) rotate(-.6deg); }
+  64% { transform: translate(10px, -3px) rotate(.5deg); }
+  72% { transform: translate(-7px, 2px); }
+  80% { transform: translate(5px, -1px); }
+  90% { transform: translate(-2px, 0); }
   100% { transform: none; }
+}
+/* El martillo: aparece arriba, baja con fuerza, golpea y se va */
+@keyframes martillo {
+  0% { opacity: 0; transform: rotate(10deg) translateY(-30px); }
+  25% { opacity: 1; transform: rotate(30deg); }
+  45% { transform: rotate(-92deg); }
+  52% { transform: rotate(-82deg); }
+  72% { opacity: 1; transform: rotate(-86deg); }
+  100% { opacity: 0; transform: rotate(-50deg) translateY(-20px); }
+}
+@keyframes onda {
+  0%, 44% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
+  46% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(4); }
 }
 @keyframes llamarada {
   from { transform: translateY(40%); opacity: 1; }
   80% { opacity: 1; }
   to { transform: translateY(-110vh); opacity: 0; }
 }
-.llamarada { display: none; }
+.llamarada, .golpe { display: none; }
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(.arder) {
     animation: 380ms cubic-bezier(.5, 0, .7, .4) both arder;
@@ -248,7 +265,25 @@ td .puesto { font-size: 16px; }
     mask-size: 100% 260%;
     mask-repeat: no-repeat;
   }
-  ::view-transition-new(.martillazo) { animation: 360ms cubic-bezier(.3, 1.4, .5, 1) 300ms both martillazo; }
+  /* El golpe cae a los ~470 ms: a la vez el martillo toca, salta la onda y la página tiembla */
+  ::view-transition-new(.martillazo) { animation: 420ms ease-out 300ms both martillazo; }
+  :root:active-view-transition .golpe {
+    display: block; position: fixed; inset: 0; z-index: 56; pointer-events: none;
+    view-transition-name: golpe;
+  }
+  .golpe .martillo {
+    --w: min(150px, 30vw);
+    position: absolute; left: calc(50% + var(--w) * .16); top: calc(38vh - var(--w) * .93); width: var(--w); height: auto;
+    transform-origin: 50% 93%;
+    filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .6));
+    animation: 700ms cubic-bezier(.6, 0, .4, 1) both martillo;
+  }
+  .golpe .onda {
+    position: absolute; left: 50%; top: 38vh; width: 120px; height: 120px; border-radius: 50%;
+    border: 6px solid #ffb547; box-shadow: 0 0 30px #ff4d1a, inset 0 0 20px #ff8a00;
+    animation: 700ms ease-out both onda;
+  }
+  ::view-transition-group(golpe), ::view-transition-new(golpe), ::view-transition-old(golpe) { animation: none; }
   /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
   :root:active-view-transition .llamarada {
     display: block; position: fixed; left: -10%; right: -10%; bottom: 0; height: 70vh; z-index: 55; pointer-events: none;
