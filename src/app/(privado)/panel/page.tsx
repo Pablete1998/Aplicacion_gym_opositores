@@ -1,10 +1,11 @@
 import Link from "next/link";
-import { exigirRol, listarAlumnos } from "@/lib/datos";
+import { exigirRol, listarAlumnos, uno } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
 
 // Igual que en Informes: sin marcas en este tiempo, el alumno necesita atención
 const DIAS_SIN_MARCAS = 21;
 const ZONA = "Europe/Madrid";
+const HORA = new Intl.DateTimeFormat("es-ES", { timeStyle: "short", timeZone: ZONA });
 
 // Medianoche de hoy en Madrid, con su desfase (horario de verano o de invierno)
 function inicioDeHoy(): string {
@@ -35,7 +36,11 @@ export default async function Panel() {
       ? supabase.from("alumnos").select("id", { count: "exact", head: true }).eq("activo", true).is("perfil_id", null)
       : Promise.resolve({ count: null }),
     direccion
-      ? supabase.from("accesos").select("alumno_id, permitido").gte("momento", inicioDeHoy())
+      ? supabase
+          .from("accesos")
+          .select("id, alumno_id, permitido, momento, motivo, alumnos(nombre, apellidos)")
+          .gte("momento", inicioDeHoy())
+          .order("momento", { ascending: false })
       : Promise.resolve({ data: null }),
   ]);
 
@@ -44,7 +49,7 @@ export default async function Panel() {
   const sinGrupo = alumnos.filter((a) => !a.grupo).length;
   const cuotasPendientes = alumnos.filter((a) => !a.cuota_al_dia).length;
   const dentroHoy = new Set((entradasHoy ?? []).filter((e) => e.permitido).map((e) => e.alumno_id)).size;
-  const rechazadasHoy = (entradasHoy ?? []).filter((e) => !e.permitido).length;
+  const rechazadasHoy = (entradasHoy ?? []).filter((e) => !e.permitido);
 
   const pendientes: { cuantos: number; texto: string; href: string; accion: string }[] = [
     { cuantos: sinMarcas, texto: `sin marcas en ${DIAS_SIN_MARCAS} días`, href: "/informes", accion: "Ver en Informes" },
@@ -110,12 +115,37 @@ export default async function Panel() {
             <Link href="/alumnos" className="dato"><span className="v">{alumnos.length}</span>alumnos activos</Link>
             <div className="dato"><span className="v">{marcasSemana ?? 0}</span>marcas esta semana</div>
             {direccion && <Link href="/cuotas" className="dato"><span className="v">{dentroHoy}</span>han entrado hoy</Link>}
-            {direccion && rechazadasHoy > 0 && (
-              <Link href="/cuotas" className="dato"><span className="v">{rechazadasHoy}</span>entradas rechazadas hoy</Link>
+            {direccion && rechazadasHoy.length > 0 && (
+              <a href="#rechazadas" className="dato"><span className="v">{rechazadasHoy.length}</span>entradas rechazadas hoy</a>
             )}
           </div>
         </section>
       </div>
+
+      {rechazadasHoy.length > 0 && (
+        <section className="panel" id="rechazadas">
+          <h2>Entradas rechazadas hoy</h2>
+          <div className="tbl">
+            <table>
+              <thead><tr><th>Hora</th><th>Quién</th><th>Motivo</th><th></th></tr></thead>
+              <tbody>
+                {rechazadasHoy.map((e) => {
+                  const alumno = uno(e.alumnos);
+                  return (
+                    <tr key={e.id}>
+                      <td className="num">{HORA.format(new Date(e.momento))}</td>
+                      <td>{alumno && e.alumno_id ? <Link href={`/alumnos/${e.alumno_id}`}>{alumno.nombre} {alumno.apellidos}</Link> : "QR desconocido"}</td>
+                      <td><span className="pill p-no_apto">{e.motivo ?? "Rechazada"}</span></td>
+                      <td>{e.motivo === "Cuota pendiente" && <Link href="/cuotas" className="btn ghost">Ir a Cuotas</Link>}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <p className="sub"><Link href="/cuotas#entradas">Ver todas las entradas</Link></p>
+        </section>
+      )}
     </>
   );
 }
