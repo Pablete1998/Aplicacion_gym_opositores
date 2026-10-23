@@ -15,7 +15,9 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | `/personal` | Dirección | Dar acceso (contraseña provisional), cambiar rol, quitar acceso y asignar preparadores a grupos |
 | `/cuenta` | Todos | Cambiar la contraseña (obligatorio tras una provisional) |
 | `/acceso` | Recepción, dirección | Lector de QR: registra la entrada y la deniega si la cuota está pendiente |
-| `/mi` | Alumno | Su evolución y su QR de acceso |
+| `/mi` | Alumno | Su evolución, su QR de acceso y sus facturas |
+| `/facturas` | Dirección | Facturas de las cuotas (salen solas al marcar una cuota pagada), rectificativas, datos fiscales y CSV para el gestor por mes o trimestre |
+| `/facturas/[id]` | Dirección, el alumno | Factura para imprimir o guardar en PDF |
 
 Las oposiciones son datos: cada una tiene sus pruebas (unidad y si más es mejor) y sus baremos (mínimo y objetivo, por sexo y edad).
 Añadir una oposición nueva no requiere tocar código.
@@ -26,7 +28,7 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql` y `supabase/migrations/0007_testigo.sql`.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql`, `supabase/migrations/0007_testigo.sql` y `supabase/migrations/0008_facturas.sql`.
 3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
    La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.

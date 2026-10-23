@@ -1,6 +1,8 @@
 import { exigirRol, listarAlumnos, uno } from "@/lib/datos";
 import { createClient } from "@/lib/supabase/server";
 import { mesActual, nombreMes } from "@/lib/informes";
+import Link from "next/link";
+import { numeroFactura } from "@/lib/facturas";
 import { FORMAS_PAGO, type FormaPago } from "@/lib/pagos";
 import { marcarTodasPendientes } from "./actions";
 import { Tabla, type FilaCuota } from "./Tabla";
@@ -11,12 +13,22 @@ export default async function Cuotas() {
   await exigirRol("direccion");
   const supabase = await createClient();
   const mes = mesActual();
-  const [alumnos, { data: accesos }, { data: pagos }] = await Promise.all([
+  const [alumnos, { data: accesos }, { data: pagos }, { data: datos }] = await Promise.all([
     listarAlumnos(),
     supabase.from("accesos").select("id, momento, permitido, motivo, alumnos(nombre, apellidos)").order("momento", { ascending: false }).limit(30),
-    supabase.from("pagos").select("alumno_id, forma").eq("mes", mes),
+    supabase.from("pagos").select("alumno_id, forma, facturas(id, serie, numero, rectifica_id)").eq("mes", mes),
+    supabase.from("datos_facturacion").select("razon_social, nif, domicilio, precio_cuota").maybeSingle(),
   ]);
   const formaDe = new Map((pagos ?? []).map((p) => [p.alumno_id, p.forma as FormaPago]));
+  // La factura vigente de la cuota de este mes (la que no es rectificativa ni está rectificada)
+  const facturaDe = new Map(
+    (pagos ?? []).flatMap((p) => {
+      const anuladas = new Set(p.facturas.map((f) => f.rectifica_id));
+      const f = p.facturas.find((f) => !f.rectifica_id && !anuladas.has(f.id));
+      return f ? [[p.alumno_id, { id: f.id, numero: numeroFactura(f.serie, f.numero) }] as const] : [];
+    }),
+  );
+  const faltanDatos = !datos?.razon_social || !datos.nif || !datos.domicilio || datos.precio_cuota === null;
   // Cuántos han pagado este mes de cada forma
   const porForma = Object.entries(FORMAS_PAGO).map(([forma, nombre]) => ({
     nombre,
@@ -27,6 +39,7 @@ export default async function Cuotas() {
   const ordenados: FilaCuota[] = [...pendientes, ...alumnos.filter((a) => a.cuota_al_dia)].map((a) => ({
     ...a,
     forma: (a.cuota_al_dia && formaDe.get(a.id)) || null,
+    factura: (a.cuota_al_dia && facturaDe.get(a.id)) || null,
   }));
 
   return (
@@ -43,6 +56,12 @@ export default async function Cuotas() {
         <p className="sub">
           {nombreMes(mes).charAt(0).toUpperCase() + nombreMes(mes).slice(1)}: {porForma.map((f) => `${f.cuantos} ${f.nombre.toLowerCase()}`).join(", ")}.
         </p>
+        {faltanDatos && (
+          <p className="aviso error">
+            Las cuotas cobradas aún no generan factura: faltan los datos fiscales o el precio de la cuota.{" "}
+            <Link href="/facturas#datos">Rellénalos en Facturas</Link>.
+          </p>
+        )}
         <Tabla filas={ordenados} />
       </section>
 

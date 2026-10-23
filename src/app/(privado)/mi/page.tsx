@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import { Ficha } from "@/components/Ficha";
 import { Instalar } from "@/components/Instalar";
 import { formatoMarca, siguienteMeta, type Unidad } from "@/lib/baremo";
+import { euros, numeroFactura } from "@/lib/facturas";
 import { cargarFicha, diasDeAsistencia, exigirRol, miAlumnoId } from "@/lib/datos";
 import { ETIQUETA_TENDENCIA, mesDe, type Tendencia } from "@/lib/informes";
 import { hoyEnEspana } from "@/lib/sesiones";
@@ -31,13 +32,15 @@ export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
   if (!id || !ficha) return <p className="sub">Tu usuario aún no está vinculado a una ficha de alumno. Avisa en recepción.</p>;
 
   const supabase = await createClient();
-  const [qr, dias, { data: toquesDatos }, { data: rankingDatos }, { data: planHoy }] = await Promise.all([
+  const [qr, dias, { data: toquesDatos }, { data: rankingDatos }, { data: planHoy }, { data: facturas }] = await Promise.all([
     QRCode.toString(ficha.codigo_acceso, { type: "svg", margin: 1 }),
     diasDeAsistencia(id, mesDe(new Date())),
     supabase.rpc("mis_toques"),
     supabase.rpc("ranking_mi_grupo", { p_desde: haceDias(DIAS_RANKING), p_antes: haceDias(DIAS_RANKING * 2) }),
     // Plan de hoy de su grupo (RLS) y si ya ha empezado o terminado la sesión
     supabase.from("planes").select("titulo, plan_ejercicios(id), sesiones(terminada_en)").eq("fecha", hoyEnEspana()).maybeSingle(),
+    // Sus facturas (RLS), las últimas primero
+    supabase.from("facturas").select("id, serie, numero, fecha, total").order("fecha", { ascending: false }).order("numero", { ascending: false }).limit(12),
   ]);
   const sesionHoy = planHoy?.sesiones[0];
   // Si la migración 0004 aún no está aplicada, las funciones fallan y no se muestra ni ranking ni toques
@@ -170,6 +173,21 @@ export default async function MiEvolucion({ searchParams }: PageProps<"/mi">) {
           </div>
         </div>
       </section>
+
+      {facturas && facturas.length > 0 && (
+        <section className="panel" id="facturas">
+          <h2>Mis facturas</h2>
+          <ul className="evolucion">
+            {facturas.map((f) => (
+              <li key={f.id}>
+                <Link href={`/facturas/${f.id}`} className="num">{numeroFactura(f.serie, f.numero)}</Link>
+                <span className="sub">{f.fecha.split("-").reverse().join("/")}</span>
+                <span className="num">{euros(Number(f.total))}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
     </>
   );
 }

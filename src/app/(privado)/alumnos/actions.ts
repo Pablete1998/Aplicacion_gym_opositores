@@ -18,6 +18,9 @@ function leerFormulario(form: FormData) {
     grupo_id: texto("grupo_id") || null,
     cuota_al_dia: form.get("cuota_al_dia") === "on",
     activo: form.get("activo") !== "off",
+    nif: texto("nif").toUpperCase().replace(/[\s-]/g, "") || null,
+    domicilio: texto("domicilio") || null,
+    cuota_importe: texto("cuota_importe") ? Number(texto("cuota_importe").replace(",", ".")) : null,
   };
 }
 
@@ -25,6 +28,7 @@ function validar(datos: ReturnType<typeof leerFormulario>): string | null {
   if (!datos.nombre || !datos.apellidos) return "Escribe nombre y apellidos.";
   if (datos.sexo !== "H" && datos.sexo !== "M") return "Elige el sexo (se usa para aplicar el baremo).";
   if (!datos.oposicion_id) return "Elige la oposición.";
+  if (datos.cuota_importe !== null && !(datos.cuota_importe >= 0)) return "La cuota tiene que ser un importe en euros.";
   return null;
 }
 

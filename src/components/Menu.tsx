@@ -21,6 +21,7 @@ const ICONOS = {
   personal: "M15 7a4 4 0 1 1-5.6 3.7L3 17v4h4v-2h2v-2h2l1.3-1.3A4 4 0 0 1 15 7ZM16.5 8.5v.01",
   mi: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM4 22a8 8 0 0 1 16 0",
   planificar: "M4 5h16v16H4zM4 10h16M9 3v4M15 3v4M8 14h3M8 17h6",
+  facturas: "M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h8M9 9h2",
   mas: "M5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM19 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
 } as const;
 
@@ -35,6 +36,7 @@ const MENU: Record<Rol, Entrada[]> = {
     ["/simulacro", "Simulacros", "simulacros"],
     ["/informes", "Informes", "informes"],
     ["/cuotas", "Cuotas", "cuotas"],
+    ["/facturas", "Facturas", "facturas"],
     ["/oposiciones", "Oposiciones", "oposiciones"],
     ["/personal", "Personal", "personal"],
   ],
