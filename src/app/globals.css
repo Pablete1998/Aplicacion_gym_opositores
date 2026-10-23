@@ -238,13 +238,13 @@ td .puesto { font-size: 16px; }
   90% { transform: translate(-2px, 0); }
   100% { transform: none; }
 }
-/* El martillo viene desde el fondo hacia la pantalla, la golpea (~470 ms) y se retira */
+/* El martillo sube desde abajo hacia la pantalla, la golpea (~470 ms) y se retira */
 @keyframes martillo {
-  0% { opacity: 0; transform: translate(-50%, -50%) translateY(-30vh) scale(.15) rotate(-25deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
+  0% { opacity: 0; transform: translate(-50%, -50%) translateY(60vh) scale(.35) rotate(-18deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
   20% { opacity: 1; }
   66% { transform: translate(-50%, -50%) scale(1.5) rotate(0deg); filter: blur(0) drop-shadow(0 20px 30px rgba(0, 0, 0, .7)); }
   72% { transform: translate(-50%, -50%) scale(1.42) rotate(1deg); }
-  100% { opacity: 0; transform: translate(-50%, -50%) translateY(6vh) scale(.9) rotate(8deg); filter: blur(2px); }
+  100% { opacity: 0; transform: translate(-50%, -50%) translateY(55vh) scale(.9) rotate(8deg); filter: blur(2px); }
 }
 /* El cristal se raja de golpe y luego se desvanece */
 @keyframes grietas {

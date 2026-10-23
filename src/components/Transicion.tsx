@@ -19,7 +19,7 @@ const GRIETAS = [
 ];
 
 // Animación al cambiar de página: la página vieja arde de abajo arriba (una llamarada la barre)
-// y la nueva llega con un martillazo contra la pantalla: el martillo viene hacia ti, golpea el
+// y la nueva llega con un martillazo contra la pantalla: el martillo sube desde abajo hacia ti, golpea el
 // cristal, lo deja agrietado un momento y todo tiembla. Cambiar filtros o guardar no anima.
 export function Transicion({ children }: { children: React.ReactNode }) {
   const ruta = usePathname();
@@ -35,7 +35,7 @@ export function Transicion({ children }: { children: React.ReactNode }) {
         <svg className="grietas" viewBox="-100 -100 200 200">
           {GRIETAS.map((d) => <path key={d} d={d} pathLength={1} />)}
         </svg>
-        {/* El martillo visto de frente: la cara de golpeo y el mango hacia ti */}
+        {/* El martillo visto de frente: la cara cuadrada de golpeo y el mango hacia ti */}
         <svg className="martillo" viewBox="0 0 200 260">
           <defs>
             <radialGradient id="acero" cx="38%" cy="32%" r="75%">
@@ -46,8 +46,8 @@ export function Transicion({ children }: { children: React.ReactNode }) {
           </defs>
           <path d="M82 120 L118 120 L132 258 L68 258 Z" fill="#8a4b1f" stroke="#2a1405" strokeWidth="4" />
           <path d="M70 226 L130 226 L132 258 L68 258 Z" fill="#ff4d1a" />
-          <circle cx="100" cy="92" r="84" fill="url(#acero)" stroke="#1b1d20" strokeWidth="5" />
-          <circle cx="100" cy="92" r="64" fill="none" stroke="#2b2f35" strokeWidth="3" opacity=".6" />
+          <rect x="16" y="8" width="168" height="168" rx="14" fill="url(#acero)" stroke="#1b1d20" strokeWidth="5" />
+          <rect x="36" y="28" width="128" height="128" rx="6" fill="none" stroke="#2b2f35" strokeWidth="3" opacity=".6" />
         </svg>
       </div>
     </>
