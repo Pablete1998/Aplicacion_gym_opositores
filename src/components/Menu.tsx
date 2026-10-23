@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
+import Link, { useLinkStatus } from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef } from "react";
+import { useRef, ViewTransition } from "react";
 import type { Rol } from "@/lib/datos";
 
 type Icono = keyof typeof ICONOS;
@@ -60,6 +60,21 @@ const MENU: Record<Rol, Entrada[]> = {
 };
 const EN_BARRA = 5;
 
+// Mientras carga la sección pulsada, una barra de fuego arriba del todo
+function Cargando() {
+  const { pending } = useLinkStatus();
+  return pending ? <span className="cargando" aria-hidden="true" /> : null;
+}
+
+// La pastilla de la sección activa se desliza de una entrada a otra del menú
+function Pastilla({ activa }: { activa: boolean }) {
+  return activa ? (
+    <ViewTransition name="menu-activo" share="pastilla" default="none">
+      <span className="pastilla" aria-hidden="true" />
+    </ViewTransition>
+  ) : null;
+}
+
 function Icono({ nombre }: { nombre: Icono }) {
   return (
     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -86,7 +101,9 @@ export function Menu({ rol }: { rol: Rol }) {
       <nav className="nav" aria-label="Menú">
         {entradas.map(([href, texto]) => (
           <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
-            {texto}
+            <Pastilla activa={activa(href)} />
+            <span>{texto}</span>
+            <Cargando />
           </Link>
         ))}
       </nav>
@@ -97,6 +114,7 @@ export function Menu({ rol }: { rol: Rol }) {
             <Link key={href} href={href} aria-current={activa(href) ? "page" : undefined}>
               <Icono nombre={icono} />
               {texto}
+              <Cargando />
             </Link>
           ))}
           {sobran && (
@@ -110,6 +128,7 @@ export function Menu({ rol }: { rol: Rol }) {
                   <Link key={href} href={href} onClick={cerrar} aria-current={activa(href) ? "page" : undefined}>
                     <Icono nombre={icono} />
                     {texto}
+                    <Cargando />
                   </Link>
                 ))}
                 <Link href="/cuenta" onClick={cerrar} aria-current={activa("/cuenta") ? "page" : undefined}>

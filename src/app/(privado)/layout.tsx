@@ -3,6 +3,7 @@ import { perfilActual } from "@/lib/datos";
 import { salir } from "@/app/login/actions";
 import { Logo } from "@/components/Logo";
 import { Menu } from "@/components/Menu";
+import { Transicion } from "@/components/Transicion";
 
 // Todo depende de la sesión del usuario: se renderiza en el servidor en cada petición
 export const instant = false;
@@ -32,7 +33,7 @@ export default async function LayoutPrivado({ children }: { children: React.Reac
             Estás usando una contraseña provisional. <Link href="/cuenta">Cámbiala ahora</Link>.
           </p>
         )}
-        {children}
+        <Transicion>{children}</Transicion>
       </main>
     </>
   );
