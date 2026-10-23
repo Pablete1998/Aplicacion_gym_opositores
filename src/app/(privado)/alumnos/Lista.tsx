@@ -3,11 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { AlumnoResumen } from "@/lib/datos";
+import { normal } from "@/lib/texto";
 
 const SIN_GRUPO = "sin";
-
-// Sin tildes ni mayúsculas, para que «jose» encuentre «José»
-const normal = (texto: string) => texto.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
 
 export function Lista({ alumnos, conCuota, grupoInicial }: { alumnos: AlumnoResumen[]; conCuota: boolean; grupoInicial?: string }) {
   const [buscar, setBuscar] = useState("");
