@@ -42,7 +42,7 @@ a { color: inherit; }
 main.wrap { padding-block: 28px 48px; display: grid; gap: 18px; }
 .sub { color: var(--muted); margin: 4px 0 0; }
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; display: grid; gap: 12px; }
-.grid2 { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+.grid2 { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); }
 .tbl { overflow-x: auto; }
 table { width: 100%; border-collapse: collapse; font-size: 14px; }
 th { text-align: left; font-weight: 500; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .06em; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
@@ -202,3 +202,15 @@ h3 { font-size: 17px; }
 .factura .num { text-align: right; }
 .factura-huella { font-family: var(--f-mono), monospace; font-size: 10px; color: var(--muted); word-break: break-all; }
 @media print { .factura { max-width: none; } }
+/* Rankings */
+.rankings { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(440px, 100%), 1fr)); }
+.rankings > .panel { align-content: start; }
+.podios { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr)); }
+.rankings > .panel, .podios > div { min-width: 0; }
+.podios h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 6px; }
+.podio { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.podio li { display: grid; grid-template-columns: 2.2em minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 4px 6px; border-radius: 6px; }
+.podio li.yo { background: var(--signal-soft); }
+.puesto { font-size: 18px; line-height: 1; text-align: center; font-family: var(--f-mono), monospace; }
+td .puesto { font-size: 16px; }
+.podio li > span:nth-child(2) { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

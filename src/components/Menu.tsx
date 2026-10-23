@@ -22,6 +22,7 @@ const ICONOS = {
   mi: "M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10ZM4 22a8 8 0 0 1 16 0",
   planificar: "M4 5h16v16H4zM4 10h16M9 3v4M15 3v4M8 14h3M8 17h6",
   facturas: "M6 2h9l5 5v15H6zM14 2v6h6M9 13h8M9 17h8M9 9h2",
+  rankings: "M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3",
   mas: "M5 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM12 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3ZM19 13.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z",
 } as const;
 
@@ -35,6 +36,7 @@ const MENU: Record<Rol, Entrada[]> = {
     ["/planificar", "Planificar", "planificar"],
     ["/simulacro", "Simulacros", "simulacros"],
     ["/informes", "Informes", "informes"],
+    ["/rankings", "Rankings", "rankings"],
     ["/cuotas", "Cuotas", "cuotas"],
     ["/facturas", "Facturas", "facturas"],
     ["/oposiciones", "Oposiciones", "oposiciones"],
@@ -47,10 +49,12 @@ const MENU: Record<Rol, Entrada[]> = {
     ["/planificar", "Planificar", "planificar"],
     ["/simulacro", "Simulacros", "simulacros"],
     ["/informes", "Informes", "informes"],
+    ["/rankings", "Rankings", "rankings"],
   ],
   alumno: [
     ["/mi/sesion", "Sesión de hoy", "registrar"],
     ["/mi", "Mi evolución", "mi"],
+    ["/rankings", "Rankings", "rankings"],
   ],
   recepcion: [["/acceso", "Acceso", "acceso"]],
 };
