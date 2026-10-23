@@ -20,6 +20,7 @@ function leerFormulario(form: FormData) {
     activo: form.get("activo") !== "off",
     nif: texto("nif").toUpperCase().replace(/[\s-]/g, "") || null,
     domicilio: texto("domicilio") || null,
+    mote: texto("mote").slice(0, 30) || null,
     cuota_importe: texto("cuota_importe") ? Number(texto("cuota_importe").replace(",", ".")) : null,
   };
 }

@@ -13,7 +13,7 @@ export default async function EditarAlumno({ params }: PageProps<"/alumnos/[id]/
   const [{ data: alumno }, catalogo] = await Promise.all([
     supabase
       .from("alumnos")
-      .select("nombre, apellidos, sexo, fecha_nacimiento, oposicion_id, grupo_id, cuota_al_dia, activo, nif, domicilio, cuota_importe")
+      .select("nombre, apellidos, sexo, fecha_nacimiento, oposicion_id, grupo_id, cuota_al_dia, activo, nif, domicilio, cuota_importe, mote")
       .eq("id", id)
       .maybeSingle(),
     cargarCatalogo(),

@@ -16,7 +16,7 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | `/cuenta` | Todos | Cambiar la contraseña (obligatorio tras una provisional) |
 | `/acceso` | Recepción, dirección | Lector de QR: registra la entrada y la deniega si la cuota está pendiente |
 | `/mi` | Alumno | Su evolución, su QR de acceso y sus facturas |
-| `/rankings` | Todos menos recepción | La mejor marca de cada alumno en cada prueba, de toda la academia o por oposición, mujeres y hombres por separado (los alumnos ven nombre e inicial) |
+| `/rankings` | Todos menos recepción | La mejor marca de cada alumno en cada prueba, de toda la academia o por oposición, mujeres y hombres por separado, con el mote de cada uno si tiene |
 | `/facturas` | Dirección | Facturas de las cuotas (salen solas al marcar una cuota pagada), rectificativas, datos fiscales y CSV para el gestor por mes o trimestre |
 | `/facturas/[id]` | Dirección, el alumno | Factura para imprimir o guardar en PDF |
 

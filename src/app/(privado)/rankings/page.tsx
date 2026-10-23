@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { formatoMarca } from "@/lib/baremo";
-import { exigirRol, uno } from "@/lib/datos";
+import { exigirRol, miAlumnoId, uno } from "@/lib/datos";
 import { agruparRanking, type Ejercicio, type MarcaRanking, type PruebaRanking } from "@/lib/ranking";
 import { createClient } from "@/lib/supabase/server";
+import { ponerMote } from "./actions";
 
 const PERIODOS = { "30": "Último mes", "90": "Últimos 3 meses", todo: "Desde siempre" } as const;
 type Periodo = keyof typeof PERIODOS;
@@ -18,13 +19,15 @@ function Puesto({ puesto }: { puesto: number }) {
 
 export default async function Rankings({ searchParams }: PageProps<"/rankings">) {
   const perfil = await exigirRol("direccion", "preparador", "alumno");
-  const { opo: opoParam, periodo: periodoParam, ej } = await searchParams;
+  const { opo: opoParam, periodo: periodoParam, ej, mote: moteParam } = await searchParams;
   const periodo: Periodo = typeof periodoParam === "string" && Object.hasOwn(PERIODOS, periodoParam) ? (periodoParam as Periodo) : "90";
   const supabase = await createClient();
 
-  const [{ data: pruebasDatos }, { data: marcasDatos, error }] = await Promise.all([
+  const alumnoId = perfil.rol === "alumno" ? await miAlumnoId() : null;
+  const [{ data: pruebasDatos }, { data: marcasDatos, error }, { data: yo }] = await Promise.all([
     supabase.from("pruebas").select("id, nombre, tipo, unidad, mayor_es_mejor, orden, oposiciones!inner(nombre, activa)").eq("oposiciones.activa", true),
     supabase.rpc("ranking_academia", { p_desde: periodo === "todo" ? null : haceDias(Number(periodo)) }),
+    alumnoId ? supabase.from("alumnos").select("mote").eq("id", alumnoId).maybeSingle() : Promise.resolve({ data: null }),
   ]);
   if (error) return <p className="aviso error">Los rankings aún no están activados: falta ejecutar la migración 0009 en Supabase.</p>;
 
@@ -110,6 +113,19 @@ export default async function Rankings({ searchParams }: PageProps<"/rankings">)
             </section>
           ))}
         </div>
+      )}
+
+      {alumnoId && (
+        <section className="panel" id="mote">
+          <h2>Tu mote</h2>
+          <p className="sub">Sale junto a tu nombre en los rankings. Déjalo en blanco para no llevar mote.</p>
+          {moteParam === "ok" && <p className="aviso ok">Mote guardado.</p>}
+          {moteParam === "error" && <p className="aviso error">No se pudo guardar. Como mucho 30 letras.</p>}
+          <form action={ponerMote} className="row" style={{ justifyContent: "flex-start" }}>
+            <input name="mote" defaultValue={yo?.mote ?? ""} maxLength={30} placeholder="Ej.: el Martinico" aria-label="Tu mote" style={{ maxWidth: 260 }} />
+            <button className="btn">Guardar</button>
+          </form>
+        </section>
       )}
     </>
   );
