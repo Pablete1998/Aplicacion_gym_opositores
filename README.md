@@ -26,7 +26,7 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql` y `supabase/migrations/0005_pagos.sql`.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql` y `supabase/migrations/0006_sesiones.sql`.
 3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
    La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.

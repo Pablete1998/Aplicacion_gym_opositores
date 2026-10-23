@@ -64,6 +64,7 @@ export default async function Panel() {
 
   const acciones: { href: string; titulo: string; texto: string }[] = [
     { href: "/registrar", titulo: "Registrar marca", texto: "Apunta una marca de un alumno" },
+    { href: "/planificar", titulo: "Planificar sesión", texto: "El entrenamiento de hoy de cada grupo" },
     { href: "/simulacro", titulo: "Simulacro de grupo", texto: "Mide a todo el grupo en una prueba" },
     ...(direccion
       ? [

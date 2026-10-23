@@ -162,3 +162,25 @@ details[open] summary { margin-bottom: 8px; }
 .casilla input { width: auto; }
 .pagar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .pagar .sub { margin: 0; }
+/* Planificar y sesiones */
+.plan { display: grid; gap: 14px; }
+.ejercicios { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; counter-reset: ej; }
+.ejercicios li { counter-increment: ej; display: grid; gap: 8px; grid-template-columns: 1.2fr 1.5fr 1fr auto; align-items: end; padding: 10px; border: 1px solid var(--line); border-radius: 8px; position: relative; }
+.ejercicios li::before { content: counter(ej); position: absolute; top: -9px; left: 10px; background: var(--surface); padding: 0 6px; font-size: 12px; color: var(--signal); font-weight: 700; }
+.acciones-fila { display: flex; gap: 4px; }
+.acciones-fila .btn:disabled { opacity: .35; cursor: default; }
+@media (max-width: 720px) { .ejercicios li { grid-template-columns: 1fr 1fr; } .ejercicios li > label:nth-of-type(2) { grid-column: 1 / -1; grid-row: 2; } }
+.ejercicios-hoy { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; counter-reset: ej; }
+.ejercicios-hoy li { counter-increment: ej; display: flex; gap: 12px; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--line); border-radius: 8px; }
+.ejercicios-hoy li > div::before { content: counter(ej) ". "; color: var(--signal); font-weight: 700; }
+.con-unidad { display: flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; white-space: nowrap; }
+.con-unidad input { width: 90px; font-family: var(--f-mono), monospace; font-size: 18px; text-align: right; }
+.apuntar, .empezar { display: grid; gap: 12px; }
+.sensacion { border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 8px; }
+.sensacion legend { padding: 0 6px; color: var(--ink); }
+.sensacion label:has(input[type="radio"]) { display: flex; gap: 8px; align-items: center; color: var(--ink); font-size: 15px; }
+.sensacion input[type="radio"] { width: auto; }
+.evolucion { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.evolucion li { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.apuntado { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; }
+h3 { font-size: 17px; }
