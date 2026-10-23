@@ -7,7 +7,8 @@ const COLOR = { objetivo: "var(--ok)", apto: "var(--warn)", no_apto: "var(--bad)
 
 const fechaLarga = (f: string) => new Date(f + "T12:00").toLocaleDateString("es-ES", { day: "numeric", month: "long", year: "numeric" });
 
-export function Ficha({ ficha, pruebaId, base }: { ficha: FichaDatos; pruebaId?: string; base: string }) {
+// "antes" va justo debajo del nombre (el alumno ve ahí su próximo objetivo)
+export function Ficha({ ficha, pruebaId, base, antes }: { ficha: FichaDatos; pruebaId?: string; base: string; antes?: React.ReactNode }) {
   const sel = ficha.pruebas.find((p) => p.id === pruebaId) ?? ficha.pruebas[0];
   const examen = ficha.oposicion.fecha_examen;
   const dias = ficha.diasHastaExamen;
@@ -22,6 +23,7 @@ export function Ficha({ ficha, pruebaId, base }: { ficha: FichaDatos; pruebaId?:
           {examen && ` · examen previsto ${fechaLarga(examen)}${dias !== null && dias > 0 ? ` (faltan ${dias} días)` : ""}`}
         </p>
       </div>
+      {antes}
 
       <section className="panel">
         <h2>Situación frente al baremo</h2>
