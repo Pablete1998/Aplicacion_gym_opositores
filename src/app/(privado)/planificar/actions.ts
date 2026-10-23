@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
-import { esUnidadEjercicio } from "@/lib/sesiones";
+import { esUnidadEjercicio, UNIDAD_DE_PRUEBA } from "@/lib/sesiones";
 import { createClient } from "@/lib/supabase/server";
 
 export type Respuesta = { ok: boolean; mensaje: string } | null;
@@ -25,12 +25,22 @@ export async function guardarPlan(_prev: Respuesta, form: FormData): Promise<Res
   const nombres = form.getAll("ej_nombre").map((v) => String(v).trim());
   const pautas = form.getAll("ej_pauta").map((v) => String(v).trim());
   const unidades = form.getAll("ej_unidad").map(String);
+  const pruebasElegidas = form.getAll("ej_prueba").map(String);
+  const supabase = await createClient();
+  // La unidad de un ejercicio que es prueba oficial es la de la prueba, diga lo que diga el formulario
+  const { data: pruebas } = pruebasElegidas.some(Boolean)
+    ? await supabase.from("pruebas").select("id, unidad").in("id", pruebasElegidas.filter(Boolean))
+    : { data: [] };
+  const unidadPrueba = new Map((pruebas ?? []).map((p) => [p.id, UNIDAD_DE_PRUEBA[p.unidad] ?? null]));
   const ejercicios = nombres
-    .map((nombre, i) => ({ id: ids[i] || null, nombre, pauta: pautas[i] || null, unidad: esUnidadEjercicio(unidades[i]) ? unidades[i] : null, orden: i + 1 }))
+    .map((nombre, i) => {
+      const prueba_id = unidadPrueba.has(pruebasElegidas[i]) ? pruebasElegidas[i] : null;
+      const unidad = prueba_id ? unidadPrueba.get(prueba_id)! : esUnidadEjercicio(unidades[i]) ? unidades[i] : null;
+      return { id: ids[i] || null, nombre, pauta: pautas[i] || null, unidad, prueba_id, orden: i + 1 };
+    })
     .filter((e) => e.nombre);
   if (ejercicios.length === 0) return { ok: false, mensaje: "Añade al menos un ejercicio." };
 
-  const supabase = await createClient();
   const { data: plan, error } = await supabase
     .from("planes")
     .upsert({ grupo_id: grupo, fecha, titulo, notas }, { onConflict: "grupo_id,fecha" })
@@ -43,9 +53,9 @@ export async function guardarPlan(_prev: Respuesta, form: FormData): Promise<Res
   if (conservar.length) borrar = borrar.not("id", "in", `(${conservar.join(",")})`);
   await borrar;
   for (const e of ejercicios.filter((e) => e.id)) {
-    await supabase.from("plan_ejercicios").update({ nombre: e.nombre, pauta: e.pauta, unidad: e.unidad, orden: e.orden }).eq("id", e.id!).eq("plan_id", plan.id);
+    await supabase.from("plan_ejercicios").update({ nombre: e.nombre, pauta: e.pauta, unidad: e.unidad, prueba_id: e.prueba_id, orden: e.orden }).eq("id", e.id!).eq("plan_id", plan.id);
   }
-  const nuevos = ejercicios.filter((e) => !e.id).map(({ nombre, pauta, unidad, orden }) => ({ plan_id: plan.id, nombre, pauta, unidad, orden }));
+  const nuevos = ejercicios.filter((e) => !e.id).map(({ nombre, pauta, unidad, prueba_id, orden }) => ({ plan_id: plan.id, nombre, pauta, unidad, prueba_id, orden }));
   if (nuevos.length) await supabase.from("plan_ejercicios").insert(nuevos);
 
   revalidatePath("/planificar");
@@ -62,7 +72,7 @@ export async function copiarUltimo(form: FormData) {
   const supabase = await createClient();
   const { data: ultimo } = await supabase
     .from("planes")
-    .select("titulo, notas, plan_ejercicios(nombre, pauta, unidad, orden)")
+    .select("titulo, notas, plan_ejercicios(nombre, pauta, unidad, prueba_id, orden)")
     .eq("grupo_id", grupo)
     .lt("fecha", fecha)
     .order("fecha", { ascending: false })
@@ -87,4 +97,19 @@ export async function borrarPlan(form: FormData) {
   await supabase.from("planes").delete().eq("grupo_id", grupo).eq("fecha", fecha);
   revalidatePath("/planificar");
   redirect(volver(grupo, fecha));
+}
+
+// El preparador, como testigo, convierte la marca de sesión en marca oficial
+export async function validarMarca(form: FormData) {
+  await exigirRol("direccion", "preparador");
+  const supabase = await createClient();
+  await supabase.rpc("validar_marca", { p_marca: String(form.get("marca") ?? "") });
+  revalidatePath("/planificar");
+}
+
+export async function anularValidacion(form: FormData) {
+  await exigirRol("direccion", "preparador");
+  const supabase = await createClient();
+  await supabase.rpc("anular_validacion", { p_marca: String(form.get("marca") ?? "") });
+  revalidatePath("/planificar");
 }

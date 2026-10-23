@@ -10,7 +10,7 @@ export async function Sesiones({ alumnoId, titulo = "Sesiones de entrenamiento" 
   const supabase = await createClient();
   const { data } = await supabase
     .from("sesiones")
-    .select("id, terminada_en, sensacion, notas, planes(fecha, titulo), sesion_marcas(valor, hecho, plan_ejercicios(nombre, unidad, orden))")
+    .select("id, terminada_en, sensacion, notas, planes(fecha, titulo), sesion_marcas(valor, hecho, resultado_id, plan_ejercicios(nombre, unidad, orden))")
     .eq("alumno_id", alumnoId)
     .order("empezada_en", { ascending: false })
     .limit(100);
@@ -44,7 +44,7 @@ export async function Sesiones({ alumnoId, titulo = "Sesiones de entrenamiento" 
   return (
     <section className="panel" id="sesiones">
       <h2>{titulo}</h2>
-      <p className="sub">{sesiones.filter((s) => s.terminada_en).length} sesiones terminadas.</p>
+      <p className="sub">{sesiones.filter((s) => s.terminada_en).length} sesiones terminadas. ✓ = marca validada por el preparador, cuenta como oficial.</p>
       {evolucion.length > 0 && (
         <>
           <h3>Cómo evoluciona cada ejercicio</h3>
@@ -72,7 +72,7 @@ export async function Sesiones({ alumnoId, titulo = "Sesiones de entrenamiento" 
                 <td>{s.sensacion ? SENSACIONES[s.sensacion] : ""}{s.notas && <div className="sub">{s.notas}</div>}</td>
                 <td className="apuntado">
                   {s.marcas.length === 0 ? <span className="sub">Nada</span> : s.marcas.map((m) => (
-                    <span key={m.ejercicio!.nombre}>{m.ejercicio!.nombre}: <span className="num">{formatoEjercicio(m.ejercicio!.unidad, m.valor === null ? null : Number(m.valor))}</span></span>
+                    <span key={m.ejercicio!.nombre}>{m.ejercicio!.nombre}: <span className="num">{formatoEjercicio(m.ejercicio!.unidad, m.valor === null ? null : Number(m.valor))}</span>{m.resultado_id && <span title="Validada por su preparador: cuenta como marca oficial"> ✓</span>}</span>
                   ))}
                 </td>
               </tr>

@@ -16,7 +16,8 @@ export function Empezar({ plan, bloqueo }: { plan: string; bloqueo: string | nul
   );
 }
 
-export interface EjercicioSesion { id: string; nombre: string; pauta: string | null; unidad: string | null; valor: string; hecho: boolean }
+// oficial: el preparador ya la ha validado como testigo y no se puede cambiar
+export interface EjercicioSesion { id: string; nombre: string; pauta: string | null; unidad: string | null; valor: string; hecho: boolean; oficial: boolean }
 
 export function Apuntar({ sesion, ejercicios }: { sesion: string; ejercicios: EjercicioSesion[] }) {
   const [estado, accion, enviando] = useActionState(guardarSesion, null);
@@ -32,7 +33,9 @@ export function Apuntar({ sesion, ejercicios }: { sesion: string; ejercicios: Ej
               <strong>{e.nombre}</strong>
               {e.pauta && <div className="sub">{e.pauta}</div>}
             </div>
-            {e.unidad ? (
+            {e.oficial ? (
+              <span className="con-unidad"><span className="num">{e.valor} {e.unidad}</span> <span className="pill p-objetivo">✓ Validada</span></span>
+            ) : e.unidad ? (
               <label>
                 <span className="visually-hidden">{e.nombre} en {UNIDADES_EJERCICIO[e.unidad as UnidadEjercicio] ?? e.unidad}</span>
                 <span className="con-unidad">

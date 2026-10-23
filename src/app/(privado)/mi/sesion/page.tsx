@@ -21,7 +21,7 @@ export default async function SesionDeHoy({ searchParams }: PageProps<"/mi/sesio
       .maybeSingle(),
   ]);
   const { data: sesion } = plan
-    ? await supabase.from("sesiones").select("id, terminada_en, sensacion, sesion_marcas(ejercicio_id, valor, hecho)").eq("plan_id", plan.id).eq("alumno_id", id).maybeSingle()
+    ? await supabase.from("sesiones").select("id, terminada_en, sensacion, sesion_marcas(ejercicio_id, valor, hecho, resultado_id)").eq("plan_id", plan.id).eq("alumno_id", id).maybeSingle()
     : { data: null };
   const ejercicios = [...(plan?.plan_ejercicios ?? [])].sort((a, b) => a.orden - b.orden);
   const apuntado = new Map((sesion?.sesion_marcas ?? []).map((m) => [m.ejercicio_id, m]));
@@ -60,7 +60,7 @@ export default async function SesionDeHoy({ searchParams }: PageProps<"/mi/sesio
                 sesion={sesion.id}
                 ejercicios={ejercicios.map((e) => {
                   const m = apuntado.get(e.id);
-                  return { id: e.id, nombre: e.nombre, pauta: e.pauta, unidad: e.unidad, valor: m?.valor == null ? "" : e.unidad === "seg" && Number(m.valor) >= 60 ? formatoEjercicio("seg", Number(m.valor)) : String(m.valor).replace(".", ","), hecho: Boolean(m) };
+                  return { id: e.id, nombre: e.nombre, pauta: e.pauta, unidad: e.unidad, valor: m?.valor == null ? "" : e.unidad === "seg" && Number(m.valor) >= 60 ? formatoEjercicio("seg", Number(m.valor)) : String(m.valor).replace(".", ","), hecho: Boolean(m), oficial: Boolean(m?.resultado_id) };
                 })}
               />
             )}

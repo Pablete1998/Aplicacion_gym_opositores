@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { exigirRol, uno } from "@/lib/datos";
-import { hoyEnEspana, SENSACIONES } from "@/lib/sesiones";
+import { formatoEjercicio, hoyEnEspana, SENSACIONES } from "@/lib/sesiones";
 import { createClient } from "@/lib/supabase/server";
-import { borrarPlan, copiarUltimo } from "./actions";
+import { anularValidacion, borrarPlan, copiarUltimo, validarMarca } from "./actions";
 import { PlanForm } from "./PlanForm";
 
 const FECHA = new Intl.DateTimeFormat("es-ES", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" });
@@ -20,7 +20,7 @@ export default async function Planificar({ searchParams }: PageProps<"/planifica
   const fecha = typeof fechaParam === "string" && /^\d{4}-\d{2}-\d{2}$/.test(fechaParam) ? fechaParam : hoy;
   const supabase = await createClient();
 
-  let consulta = supabase.from("grupos").select("id, nombre, oposiciones(nombre)").order("nombre");
+  let consulta = supabase.from("grupos").select("id, nombre, oposicion_id, oposiciones(nombre)").order("nombre");
   if (perfil.rol === "preparador") consulta = consulta.eq("preparador_id", perfil.id);
   const { data: grupos } = await consulta;
   const grupo = grupos?.find((g) => g.id === grupoParam) ?? grupos?.[0] ?? null;
@@ -35,18 +35,22 @@ export default async function Planificar({ searchParams }: PageProps<"/planifica
     );
   }
 
-  const [{ data: plan }, { data: alumnos }] = await Promise.all([
+  const [{ data: plan }, { data: alumnos }, { data: pruebas }] = await Promise.all([
     supabase
       .from("planes")
-      .select("id, titulo, notas, plan_ejercicios(id, nombre, pauta, unidad, orden), sesiones(alumno_id, terminada_en, sensacion, notas, sesion_marcas(id))")
+      .select("id, titulo, notas, plan_ejercicios(id, nombre, pauta, unidad, prueba_id, orden), sesiones(alumno_id, terminada_en, sensacion, notas, sesion_marcas(id, ejercicio_id, valor, resultado_id))")
       .eq("grupo_id", grupo.id)
       .eq("fecha", fecha)
       .maybeSingle(),
     supabase.from("alumnos").select("id, nombre, apellidos, cuota_al_dia").eq("grupo_id", grupo.id).eq("activo", true).order("apellidos"),
+    // Pruebas físicas de la oposición del grupo: un ejercicio puede ser una de ellas
+    supabase.from("pruebas").select("id, nombre, unidad").eq("oposicion_id", grupo.oposicion_id).eq("tipo", "fisica").order("orden"),
   ]);
   const ejercicios = [...(plan?.plan_ejercicios ?? [])].sort((a, b) => a.orden - b.orden);
   const sesionDe = new Map((plan?.sesiones ?? []).map((s) => [s.alumno_id, s]));
   const hechas = (plan?.sesiones ?? []).filter((s) => s.terminada_en).length;
+  // Ejercicios que son prueba oficial: sus marcas las puede validar el preparador como testigo
+  const oficiales = new Map(ejercicios.filter((e) => e.prueba_id).map((e) => [e.id, e]));
 
   return (
     <>
@@ -95,7 +99,8 @@ export default async function Planificar({ searchParams }: PageProps<"/planifica
           fecha={fecha}
           titulo={plan?.titulo ?? ""}
           notas={plan?.notas ?? ""}
-          ejercicios={ejercicios.map((e) => ({ id: e.id, nombre: e.nombre, pauta: e.pauta ?? "", unidad: e.unidad ?? "" }))}
+          ejercicios={ejercicios.map((e) => ({ id: e.id, nombre: e.nombre, pauta: e.pauta ?? "", unidad: e.unidad ?? "", prueba: e.prueba_id ?? "" }))}
+          pruebas={pruebas ?? []}
         />
         {plan && (
           <details>
@@ -115,10 +120,13 @@ export default async function Planificar({ searchParams }: PageProps<"/planifica
       {plan && (
         <section className="panel">
           <h2>Quién la ha hecho</h2>
-          <p className="sub">{hechas} de {alumnos?.length ?? 0} han terminado la sesión.</p>
+          <p className="sub">
+            {hechas} de {alumnos?.length ?? 0} han terminado la sesión.
+            {oficiales.size > 0 && " Si has visto una marca de prueba oficial, valídala y contará en su baremo, el ranking y los informes."}
+          </p>
           <div className="tbl">
             <table>
-              <thead><tr><th>Alumno</th><th>Sesión</th><th>Sensación</th><th>Nota</th></tr></thead>
+              <thead><tr><th>Alumno</th><th>Sesión</th><th>Sensación</th><th>Nota</th>{oficiales.size > 0 && <th>Marcas oficiales</th>}</tr></thead>
               <tbody>
                 {(alumnos ?? []).map((a) => {
                   const s = sesionDe.get(a.id);
@@ -133,6 +141,24 @@ export default async function Planificar({ searchParams }: PageProps<"/planifica
                       </td>
                       <td>{s?.sensacion ? SENSACIONES[s.sensacion] : ""}</td>
                       <td>{s?.notas ?? ""}</td>
+                      {oficiales.size > 0 && (
+                        <td className="testigo">
+                          {(s?.sesion_marcas ?? []).filter((m) => oficiales.has(m.ejercicio_id) && m.valor !== null).map((m) => {
+                            const e = oficiales.get(m.ejercicio_id)!;
+                            return (
+                              <form key={m.id} action={m.resultado_id ? anularValidacion : validarMarca}>
+                                <input type="hidden" name="marca" value={m.id} />
+                                {e.nombre}: <span className="num">{formatoEjercicio(e.unidad, Number(m.valor))}</span>{" "}
+                                {m.resultado_id ? (
+                                  <><span className="pill p-objetivo">✓ Oficial</span> <button className="enlace">Anular</button></>
+                                ) : (
+                                  <button className="btn ghost">Validar</button>
+                                )}
+                              </form>
+                            );
+                          })}
+                        </td>
+                      )}
                     </tr>
                   );
                 })}
