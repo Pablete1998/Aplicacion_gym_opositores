@@ -238,7 +238,7 @@ td .puesto { font-size: 16px; }
   90% { transform: translate(-2px, 0); }
   100% { transform: none; }
 }
-/* El martillo sube desde abajo hacia la pantalla, la golpea (~470 ms) y se retira */
+/* El martillo sube desde abajo hacia la pantalla, la golpea (~800 ms) y se retira */
 @keyframes martillo {
   0% { opacity: 0; transform: translate(-50%, -23%) translateY(60vh) scale(.35) rotate(-18deg); filter: blur(3px) drop-shadow(0 0 0 transparent); }
   20% { opacity: 1; }
@@ -263,6 +263,7 @@ td .puesto { font-size: 16px; }
   from { transform: scale(1, .82) skewX(-4deg); }
   to { transform: scale(.92, 1.18) skewX(5deg); }
 }
+@keyframes mantener { from, to { opacity: 1; } }
 @keyframes chispa {
   from { transform: translate(0, 0); opacity: 1; }
   to { transform: translate(14px, -60px); opacity: 0; }
@@ -275,13 +276,13 @@ td .puesto { font-size: 16px; }
 .llamarada, .golpe { display: none; }
 @media (prefers-reduced-motion: no-preference) {
   ::view-transition-old(.arder) {
-    animation: 380ms cubic-bezier(.5, 0, .7, .4) both arder;
+    animation: 650ms cubic-bezier(.5, 0, .7, .4) both arder;
     mask-image: linear-gradient(to top, transparent 0 38%, #000 62%);
     mask-size: 100% 260%;
     mask-repeat: no-repeat;
   }
-  /* El golpe cae a los ~470 ms: a la vez el martillo toca el cristal, se raja y la página tiembla */
-  ::view-transition-new(.martillazo) { animation: 420ms ease-out 300ms both martillazo; }
+  /* El golpe cae a los ~800 ms: a la vez el martillo toca el cristal, se raja y la página tiembla */
+  ::view-transition-new(.martillazo) { animation: 720ms ease-out 510ms both martillazo; }
   :root:active-view-transition .golpe {
     display: block; position: fixed; inset: 0; z-index: 56; pointer-events: none;
     view-transition-name: golpe;
@@ -289,30 +290,32 @@ td .puesto { font-size: 16px; }
   .golpe .martillo {
     position: absolute; left: 50%; top: 42vh; width: min(240px, 48vw); height: auto;
     transform-origin: 50% 23%; /* el centro de la cabeza, que es donde golpea */
-    animation: 720ms cubic-bezier(.55, 0, .45, 1) both martillo;
+    animation: 1220ms cubic-bezier(.55, 0, .45, 1) both martillo;
   }
   .golpe .grietas {
     position: absolute; left: 50%; top: 42vh; width: min(1100px, 190vw); height: auto; transform: translate(-50%, -50%);
     fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: .7; stroke-linejoin: bevel;
     filter: drop-shadow(0 0 1.5px rgba(255, 180, 90, .9));
-    animation: 1150ms linear both grietas;
+    animation: 1950ms linear both grietas;
   }
-  .golpe .grietas path { stroke-dasharray: 1; animation: 1150ms ease-out both rajar; }
+  .golpe .grietas path { stroke-dasharray: 1; animation: 1950ms ease-out both rajar; }
   .golpe .destello {
     position: absolute; left: 50%; top: 42vh; width: 220px; height: 220px; border-radius: 50%;
     background: radial-gradient(circle, #fff 0%, #ffd27a 25%, rgba(255, 77, 26, .6) 50%, transparent 70%);
-    animation: 1150ms ease-out both destello;
+    animation: 1950ms ease-out both destello;
   }
   ::view-transition-group(golpe), ::view-transition-new(golpe), ::view-transition-old(golpe) { animation: none; }
   /* El golpe siempre por encima de las páginas, que si no tapan las grietas */
   ::view-transition-group(golpe) { z-index: 3; }
+  /* La transición dura hasta que se apagan las grietas, que si no desaparecen de golpe al terminar */
+  ::view-transition-new(golpe) { animation: 1950ms linear both mantener; }
   /* La llamarada va por encima de las dos páginas, subiendo al ritmo del fuego */
   :root:active-view-transition .llamarada {
     display: block; position: fixed; left: -5%; right: -5%; bottom: 0; height: 80vh; z-index: 55; pointer-events: none;
     view-transition-name: llamarada;
     /* Debajo de las llamas, la brasa: rojo intenso que se apaga hacia abajo */
     background: linear-gradient(to bottom, transparent 0 41%, #ffe6a0 44.5%, #ff8a12 50%, #e3300b 58%, #b81a04 68%, rgba(120, 10, 0, .85) 80%, transparent);
-    animation: 520ms cubic-bezier(.5, 0, .6, 1) both llamarada;
+    animation: 880ms cubic-bezier(.5, 0, .6, 1) both llamarada;
   }
   .llamarada svg {
     display: block; width: 100%; height: 45%;
