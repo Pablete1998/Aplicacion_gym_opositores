@@ -111,6 +111,16 @@ input, select, textarea { font: inherit; color: var(--ink); background: var(--bg
   textarea { border: 1px solid #ccc; resize: none; }
   textarea::placeholder { color: transparent; }
 }
+.proximo { border-color: var(--signal); }
+.dato { font-size: 13px; color: var(--muted); }
+.dato .v { font-family: var(--f-display), sans-serif; font-size: 30px; font-weight: 700; color: var(--ink); margin-right: 4px; }
+.metas { margin: 0; padding-left: 18px; display: grid; gap: 4px; }
+.toques { border-color: var(--logo-rojo); background: var(--bad-soft); }
+.toques ul { margin: 0; padding-left: 18px; }
+tr.yo td { background: var(--signal-soft); }
+.toque .btn { text-transform: none; letter-spacing: 0; font-family: var(--f-body), sans-serif; font-size: 13px; font-weight: 500; }
+.toque { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.enlace { background: none; border: 0; text-decoration: underline; cursor: pointer; padding: 0; }
 .login { max-width: 380px; margin: 8vh auto; padding-block: 28px; background: radial-gradient(ellipse at 50% 22%, #3a0d05 0%, var(--bg) 62%); border-color: #2a1a15; }
 .camara { width: 100%; max-height: 360px; object-fit: cover; border-radius: 8px; background: #000; }
 .baremo { border-top: 1px solid var(--line); padding-top: 12px; display: grid; gap: 8px; }

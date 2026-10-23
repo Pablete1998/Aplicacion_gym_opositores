@@ -62,6 +62,21 @@ export function puntosMarca(b: Baremo, valor: number): number | null {
   return p;
 }
 
+// Siguiente escalón de una marca: el siguiente punto (oposiciones que puntúan), el apto o el objetivo.
+// "falta" es la distancia en la unidad de la prueba; null si ya no hay nada por encima.
+export function siguienteMeta(b: Baremo, valor: number): { meta: string; falta: number } | null {
+  const distancia = (referencia: number) => Math.round(Math.abs(referencia - valor) * 10) / 10;
+  if (b.puntos?.length) {
+    const p = puntosMarca(b, valor) ?? 0;
+    if (p >= b.puntos.length) return null;
+    return { meta: p === 0 ? "el primer punto" : `los ${p + 1} puntos`, falta: distancia(b.puntos[p]) };
+  }
+  const estado = estadoMarca(b, valor);
+  if (estado === "no_apto") return { meta: "el apto", falta: distancia(b.minima) };
+  if (estado === "apto" && b.objetivo !== null) return { meta: "el objetivo", falta: distancia(b.objetivo) };
+  return null;
+}
+
 export const ETIQUETA_ESTADO: Record<Estado, string> = {
   objetivo: "Objetivo",
   apto: "Apto",

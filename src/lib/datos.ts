@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { baremoAplicable, edadEn, type Baremo, type BaremoFila, type Unidad } from "@/lib/baremo";
+import { mesSiguiente } from "@/lib/informes";
 
 export type Rol = "direccion" | "preparador" | "alumno" | "recepcion";
 
@@ -166,4 +167,17 @@ export async function llevaGrupos(perfilId: string): Promise<boolean> {
   const supabase = await createClient();
   const { count } = await supabase.from("grupos").select("id", { count: "exact", head: true }).eq("preparador_id", perfilId);
   return (count ?? 0) > 0;
+}
+
+// Días distintos que el alumno entró en la academia en un mes ("2026-10"). Lo ven Dirección y el propio alumno.
+export async function diasDeAsistencia(alumnoId: string, mes: string): Promise<number> {
+  const supabase = await createClient();
+  const { data } = await supabase
+    .from("accesos")
+    .select("momento")
+    .eq("alumno_id", alumnoId)
+    .eq("permitido", true)
+    .gte("momento", `${mes}-01`)
+    .lt("momento", `${mesSiguiente(mes)}-01`);
+  return new Set((data ?? []).map((a) => a.momento.slice(0, 10))).size;
 }
