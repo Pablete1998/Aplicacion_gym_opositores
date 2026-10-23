@@ -7,7 +7,7 @@ import { FORMAS_PAGO, type FormaPago } from "@/lib/pagos";
 import { normal } from "@/lib/texto";
 import { marcarPagada, marcarPendiente } from "./actions";
 
-export type FilaCuota = AlumnoResumen & { forma: FormaPago | null };
+export type FilaCuota = AlumnoResumen & { forma: FormaPago | null; factura: { id: string; numero: string } | null };
 type Estado = "" | "pendiente" | "pagada";
 
 export function Tabla({ filas }: { filas: FilaCuota[] }) {
@@ -76,7 +76,10 @@ export function Tabla({ filas }: { filas: FilaCuota[] }) {
                 <td>{a.grupo ?? "Sin grupo"}</td>
                 <td>
                   {a.cuota_al_dia ? (
-                    <span className="pill p-objetivo">{a.forma ? `Pagada · ${FORMAS_PAGO[a.forma]}` : "Al día"}</span>
+                    <>
+                      <span className="pill p-objetivo">{a.forma ? `Pagada · ${FORMAS_PAGO[a.forma]}` : "Al día"}</span>
+                      {a.factura && <> <Link href={`/facturas/${a.factura.id}`} className="sub">Factura {a.factura.numero}</Link></>}
+                    </>
                   ) : (
                     <span className="pill p-no_apto">Pendiente</span>
                   )}

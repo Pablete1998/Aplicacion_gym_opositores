@@ -187,3 +187,18 @@ h3 { font-size: 17px; }
 .testigo { display: grid; gap: 6px; font-size: 13px; }
 .ejercicios li { grid-template-columns: 1.2fr 1.5fr 1fr 1fr auto; }
 @media (max-width: 720px) { .ejercicios li { grid-template-columns: 1fr 1fr; } }
+/* Facturas */
+.rectificar > summary { list-style: none; display: inline-block; }
+.rectificar[open] { min-width: min(320px, 80vw); }
+.rectificar form { margin-top: 8px; grid-template-columns: 1fr; }
+.factura { display: grid; gap: 18px; max-width: 820px; }
+.factura-cabecera { display: flex; flex-wrap: wrap; gap: 16px; justify-content: space-between; align-items: flex-start; }
+.factura-cabecera .informe-cabecera { align-items: flex-start; }
+.factura-numero { text-align: right; }
+.factura-numero h1 { font-size: 26px; }
+.factura h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 4px; }
+.factura tfoot th { text-align: left; border-top: 2px solid var(--ink); color: var(--ink); }
+.factura-total { font-size: 18px; text-align: right; }
+.factura .num { text-align: right; }
+.factura-huella { font-family: var(--f-mono), monospace; font-size: 10px; color: var(--muted); word-break: break-all; }
+@media print { .factura { max-width: none; } }

@@ -17,6 +17,9 @@ export interface ValoresAlumno {
   grupo_id: string | null;
   cuota_al_dia: boolean;
   activo: boolean;
+  nif: string | null;
+  domicilio: string | null;
+  cuota_importe: number | null;
 }
 
 export function FormularioAlumno({
@@ -72,6 +75,18 @@ export function FormularioAlumno({
       <label style={{ display: "flex", gap: 8, alignItems: "center" }}>
         <input id="cuota_al_dia" name="cuota_al_dia" type="checkbox" defaultChecked={valores?.cuota_al_dia ?? true} style={{ width: "auto" }} />
         Cuota al día (si no, se le deniega la entrada)
+      </label>
+      <label>
+        NIF (para factura completa)
+        <input id="nif" name="nif" defaultValue={valores?.nif ?? ""} autoComplete="off" placeholder="Sin NIF: factura simplificada" />
+      </label>
+      <label>
+        Domicilio (opcional)
+        <input id="domicilio" name="domicilio" defaultValue={valores?.domicilio ?? ""} autoComplete="off" />
+      </label>
+      <label>
+        Cuota mensual, si paga distinto (€)
+        <input id="cuota_importe" name="cuota_importe" type="number" min="0" step="0.01" defaultValue={valores?.cuota_importe ?? ""} placeholder="Precio general" />
       </label>
       {!esAlta && (
         <label>
