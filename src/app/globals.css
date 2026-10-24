@@ -358,3 +358,29 @@ ol.preguntas li.correcta { color: var(--ok); }
 .opcion input[type="radio"] { width: 20px; height: 20px; accent-color: var(--signal); }
 .importar { display: grid; gap: 12px; }
 .importar ul.aviso { margin: 0; padding-left: 28px; }
+
+/* Teoría */
+.ramas { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.rama { text-decoration: none; align-content: start; gap: 8px; }
+a.rama:hover { border-color: var(--signal); }
+.rama .pill { justify-self: start; background: var(--signal-soft); color: var(--signal); }
+.rama.pronto { opacity: .55; }
+.rama.pronto .pill { background: var(--line); color: var(--muted); }
+.avance { display: block; background: linear-gradient(90deg, var(--ok-soft) var(--avance), transparent var(--avance)); border-radius: 6px; padding: 2px 8px; }
+.aviso.medias { background: var(--warn-soft); color: var(--warn); }
+.test { display: grid; gap: 16px; }
+.enunciado { font-size: 18px; margin: 0; white-space: pre-line; }
+.opciones-test { display: grid; gap: 8px; }
+.opcion-test { display: flex; gap: 12px; align-items: baseline; text-align: left; font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 12px 14px; cursor: pointer; }
+.opcion-test b { color: var(--signal); }
+.opcion-test:hover:not(:disabled) { border-color: var(--signal); }
+.opcion-test.elegida { border-color: var(--signal); background: var(--signal-soft); }
+.opcion-test.bien { border-color: var(--ok); background: var(--ok-soft); }
+.opcion-test.mal { border-color: var(--bad); background: var(--bad-soft); }
+.reloj { font-family: var(--f-mono), ui-monospace, monospace; font-size: 26px; font-variant-numeric: tabular-nums; }
+.reloj.poco { color: var(--bad); }
+.mapa { display: flex; flex-wrap: wrap; gap: 6px; }
+.mapa button { width: 38px; height: 38px; font: inherit; font-size: 13px; color: var(--muted); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; cursor: pointer; }
+.mapa button.hecha { color: var(--ink); background: var(--signal-soft); }
+.mapa button[aria-current="true"] { border-color: var(--signal); }
+ol.revision li.elegida-mal { color: var(--bad); }

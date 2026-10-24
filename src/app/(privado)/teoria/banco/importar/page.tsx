@@ -5,7 +5,7 @@ import { Importador } from "./Importador";
 
 const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
-export default async function Importar({ searchParams }: PageProps<"/tests/importar">) {
+export default async function Importar({ searchParams }: PageProps<"/teoria/banco/importar">) {
   await exigirRol("direccion", "preparador");
   const sp = await searchParams;
   const supabase = await createClient();
@@ -15,19 +15,19 @@ export default async function Importar({ searchParams }: PageProps<"/tests/impor
   return (
     <>
       <div>
-        <p className="sub"><Link href={`/tests?oposicion=${oposicion?.id ?? ""}`}>← Banco de tests</Link></p>
+        <p className="sub"><Link href={`/teoria/banco?oposicion=${oposicion?.id ?? ""}`}>← Banco de tests</Link></p>
         <h1>Pegar preguntas desde Excel</h1>
         <p className="sub">
           Pon en Excel una pregunta por fila con estas columnas: <b>Tema · Pregunta · A · B · C · D · Correcta · Explicación</b>.
           Selecciona las filas, cópialas y pégalas aquí. También puedes subir el archivo guardado como CSV.
         </p>
         <p className="sub">
-          <a href="/tests/plantilla">Descargar la plantilla</a> · La D se deja vacía si el examen tiene tres respuestas · En «Correcta» va la letra ·
+          <a href="/teoria/banco/plantilla">Descargar la plantilla</a> · La D se deja vacía si el examen tiene tres respuestas · En «Correcta» va la letra ·
           Los temas que no existan se crean solos · Las preguntas que ya estén en el banco se saltan.
         </p>
       </div>
       <section className="panel">
-        <form className="campos" action="/tests/importar">
+        <form className="campos" action="/teoria/banco/importar">
           <label>
             Oposición
             <select name="oposicion" defaultValue={oposicion?.id}>

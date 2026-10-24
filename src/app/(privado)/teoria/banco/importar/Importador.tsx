@@ -93,7 +93,7 @@ export function Importador({ oposicionId, oposicion }: { oposicionId: string; op
       )}
       {estado && (
         <p className={`aviso ${estado.ok ? "ok" : "error"}`}>
-          {estado.mensaje} {estado.ok && <Link href={`/tests?oposicion=${oposicionId}`}>Ver el banco</Link>}
+          {estado.mensaje} {estado.ok && <Link href={`/teoria/banco?oposicion=${oposicionId}`}>Ver el banco</Link>}
         </p>
       )}
     </div>

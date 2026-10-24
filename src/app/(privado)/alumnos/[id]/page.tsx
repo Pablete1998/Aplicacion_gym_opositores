@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Ficha } from "@/components/Ficha";
 import { Sesiones } from "@/components/Sesiones";
+import { TestsAlumno } from "@/components/TestsAlumno";
 import { cargarFicha, exigirRol } from "@/lib/datos";
 import { hayClaveAdmin } from "@/lib/supabase/admin";
 import { AccesoAlumno } from "../../personal/Formularios";
@@ -31,6 +32,7 @@ export default async function FichaAlumno({ params, searchParams }: PageProps<"/
       )}
       <Ficha ficha={ficha} pruebaId={typeof prueba === "string" ? prueba : undefined} base={`/alumnos/${id}`} />
       <Sesiones alumnoId={id} />
+      <TestsAlumno alumnoId={id} />
     </>
   );
 }
