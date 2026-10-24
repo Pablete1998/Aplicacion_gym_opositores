@@ -384,3 +384,16 @@ a.rama:hover { border-color: var(--signal); }
 .mapa button.hecha { color: var(--ink); background: var(--signal-soft); }
 .mapa button[aria-current="true"] { border-color: var(--signal); }
 ol.revision li.elegida-mal { color: var(--bad); }
+
+/* Repaso diario */
+.cuenta-repaso { margin: 0; font-weight: 600; }
+.cuenta-repaso .nuevas { color: #6aa8ff; }
+.cuenta-repaso .aprendiendo { color: var(--bad); }
+.cuenta-repaso .repasar { color: var(--ok); }
+.notas-repaso { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+.notas-repaso button { display: grid; gap: 2px; justify-items: center; font: inherit; font-weight: 600; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 4px; cursor: pointer; }
+.notas-repaso small { color: var(--muted); font-weight: 400; }
+.notas-repaso .nota-1 { border-color: var(--bad); }
+.notas-repaso .nota-2 { border-color: var(--warn); }
+.notas-repaso .nota-3 { border-color: var(--ok); }
+.notas-repaso .nota-4 { border-color: #6aa8ff; }
