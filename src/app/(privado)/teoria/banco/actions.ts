@@ -4,9 +4,10 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
 import { randomUUID } from "node:crypto";
+import { guardarFilas } from "@/lib/importar";
 import { COMUN, idOposicion, leerImportacion, numeroTema } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
-import { esUuid, normal } from "@/lib/texto";
+import { esUuid } from "@/lib/texto";
 
 const texto = (form: FormData, campo: string) => String(form.get(campo) ?? "").trim();
 const oposicionValida = (valor: string) => valor === COMUN || esUuid(valor);
@@ -115,66 +116,9 @@ export async function borrarPregunta(form: FormData) {
 export async function importarPreguntas(oposicionId: string, contenido: string): Promise<Respuesta> {
   await exigirRol("direccion", "preparador");
   if (!oposicionValida(oposicionId)) return { ok: false, mensaje: "Elige la oposición." };
-  const oposicion = idOposicion(oposicionId);
   const { filas, errores } = leerImportacion(contenido);
   if (!filas.length) return { ok: false, mensaje: "No hay ninguna pregunta válida que importar." };
-
-  const supabase = await createClient();
-  const consultaTemas = supabase.from("temas").select("id, numero, nombre");
-  const { data: temas, error: e1 } = await (oposicion ? consultaTemas.eq("oposicion_id", oposicion) : consultaTemas.is("oposicion_id", null));
-  // Supabase devuelve como mucho 1000 filas por consulta: los enunciados ya guardados se leen por páginas
-  const existentes: { enunciado: string }[] = [];
-  let e2 = null;
-  for (let desde = 0; !e2; desde += 1000) {
-    const consulta = supabase.from("preguntas").select("enunciado");
-    const { data, error } = await (oposicion ? consulta.eq("oposicion_id", oposicion) : consulta.is("oposicion_id", null)).order("id").range(desde, desde + 999);
-    e2 = error;
-    existentes.push(...(data ?? []));
-    if ((data ?? []).length < 1000) break;
-  }
-  if (e1 || e2) return { ok: false, mensaje: "No se pudo leer el banco. ¿Está ejecutada la migración 0011?" };
-
-  // Un tema se reconoce por su nombre o, si solo se escribe el número («3»), por su número
-  const porNombre = new Map((temas ?? []).map((t) => [normal(t.nombre), t.id as string]));
-  const porNumero = new Map((temas ?? []).filter((t) => t.numero !== null).map((t) => [t.numero as number, t.id as string]));
-  const buscar = (nombre: string) =>
-    porNombre.get(normal(nombre)) ?? (/^\d+$/.test(nombre) ? porNumero.get(Number(nombre)) : undefined);
-
-  const nuevos = [...new Map(filas.filter((f) => f.tema && !buscar(f.tema)).map((f) => [normal(f.tema), f.tema])).values()];
-  if (nuevos.length) {
-    const { data: creados, error } = await supabase
-      .from("temas")
-      .insert(nuevos.map((nombre) => ({ oposicion_id: oposicion, nombre, numero: numeroTema(nombre) })))
-      .select("id, nombre");
-    if (error) return { ok: false, mensaje: "No se pudieron crear los temas nuevos." };
-    for (const t of creados ?? []) porNombre.set(normal(t.nombre), t.id);
-  }
-
-  const vistas = new Set(existentes.map((p) => normal(p.enunciado)));
-  const aInsertar = filas.filter((f) => {
-    const clave = normal(f.enunciado);
-    if (vistas.has(clave)) return false;
-    vistas.add(clave);
-    return true;
-  });
-  for (let i = 0; i < aInsertar.length; i += 500) {
-    const { error } = await supabase.from("preguntas").insert(
-      aInsertar.slice(i, i + 500).map((f) => ({
-        oposicion_id: oposicion,
-        tema_id: f.tema ? (buscar(f.tema) ?? null) : null,
-        enunciado: f.enunciado,
-        opciones: f.opciones,
-        correcta: f.correcta,
-        explicacion: f.explicacion,
-      })),
-    );
-    if (error) return { ok: false, mensaje: `Se importaron ${i} preguntas y luego falló. Vuelve a pegar lo mismo: las ya importadas se saltan.` };
-  }
-  revalidatePath("/teoria/banco");
-
-  const partes = [`${aInsertar.length} ${aInsertar.length === 1 ? "pregunta importada" : "preguntas importadas"}`];
-  if (nuevos.length) partes.push(`${nuevos.length} ${nuevos.length === 1 ? "tema nuevo" : "temas nuevos"}`);
-  if (filas.length > aInsertar.length) partes.push(`${filas.length - aInsertar.length} ya estaban en el banco`);
-  if (errores.length) partes.push(`${errores.length} con errores, sin importar`);
-  return { ok: true, mensaje: partes.join(" · ") + "." };
+  const r = await guardarFilas(idOposicion(oposicionId), filas);
+  if (r.ok && errores.length) r.mensaje = r.mensaje.replace(/\.$/, ` · ${errores.length} con errores, sin importar.`);
+  return r;
 }

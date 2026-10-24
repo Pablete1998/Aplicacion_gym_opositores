@@ -398,3 +398,19 @@ ol.revision li.elegida-mal { color: var(--bad); }
 .notas-repaso .nota-3 { border-color: var(--ok); }
 .notas-repaso .nota-4 { border-color: #6aa8ff; }
 .imagen-pregunta { max-width: 100%; max-height: 360px; border-radius: 8px; background: #fff; justify-self: start; }
+
+/* Temario */
+.apuntes { line-height: 1.65; gap: 0; }
+.apuntes h1 { font-size: 26px; margin: 8px 0 12px; }
+.apuntes h2 { font-size: 22px; margin: 24px 0 8px; color: var(--signal); }
+.apuntes h3 { font-size: 18px; margin: 18px 0 6px; }
+.apuntes p, .apuntes ul, .apuntes ol, .apuntes table, .apuntes blockquote { margin: 0 0 12px; }
+.apuntes li { margin: 2px 0; }
+.apuntes strong { color: var(--ink); }
+.apuntes blockquote { border-left: 3px solid var(--signal); padding: 4px 12px; background: var(--signal-soft); border-radius: 0 8px 8px 0; }
+.apuntes table { border-collapse: collapse; display: block; overflow-x: auto; }
+.apuntes th, .apuntes td { border: 1px solid var(--line); padding: 6px 10px; text-align: left; vertical-align: top; }
+.apuntes code { font-family: var(--f-mono), ui-monospace, monospace; }
+/* Esquemas: listas anidadas dibujadas como árbol */
+.apuntes .esquema ul, .apuntes ul.esquema { list-style: none; padding-left: 18px; border-left: 2px solid var(--line); }
+.fuentes { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
