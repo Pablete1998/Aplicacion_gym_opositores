@@ -1,12 +1,13 @@
 "use client";
 
 import { useActionState } from "react";
+import { ImagenPregunta } from "@/components/ImagenPregunta";
 import { LETRAS } from "@/lib/preguntas";
 import { borrarPregunta, guardarPregunta } from "./actions";
 
 type Valores = Record<"id" | "oposicion_id" | "tema_id" | "enunciado" | "a" | "b" | "c" | "d" | "correcta" | "explicacion" | "activa", string>;
 
-export function FormularioPregunta({ temas, inicial }: { temas: { id: string; nombre: string }[]; inicial: Valores }) {
+export function FormularioPregunta({ temas, inicial, imagen }: { temas: { id: string; nombre: string }[]; inicial: Valores; imagen: string | null }) {
   const [estado, accion, guardando] = useActionState(guardarPregunta, null);
   // Tras guardar, React vacía el formulario: se vuelve a montar con lo que toque (lo escrito si hubo error)
   const v = { ...inicial, ...(estado && !inicial.id ? { enunciado: "", a: "", b: "", c: "", d: "", correcta: "", explicacion: "" } : {}), ...estado?.valores };
@@ -28,6 +29,19 @@ export function FormularioPregunta({ temas, inicial }: { temas: { id: string; no
           Pregunta
           <textarea name="enunciado" rows={3} required maxLength={2000} defaultValue={v.enunciado} autoFocus={nueva} />
         </label>
+        <label>
+          Imagen (opcional: una serie de figuras, un gráfico…; PNG o JPG de hasta 2 MB)
+          <input type="file" name="imagen" accept="image/png,image/jpeg,image/webp,image/gif" />
+        </label>
+        {imagen && (
+          <div className="row" style={{ justifyContent: "flex-start" }}>
+            <ImagenPregunta nombre={imagen} alt="Imagen actual" />
+            <label className="casilla">
+              <input type="checkbox" name="quitar_imagen" />
+              Quitar la imagen
+            </label>
+          </div>
+        )}
         <fieldset className="opciones">
           <legend className="sub">Respuestas (marca la correcta; la D puede quedar vacía si el examen tiene tres)</legend>
           {(["a", "b", "c", "d"] as const).map((campo, i) => (

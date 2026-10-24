@@ -3,17 +3,9 @@ import { exigirRol, miAlumnoId, uno } from "@/lib/datos";
 import { etiquetaTema } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { formatoNota, TIPOS, type TipoTest } from "@/lib/tests";
+import { SelectorTema, type TemaAlumno } from "../SelectorTema";
 import { empezarTest } from "./actions";
 
-interface TemaAlumno {
-  tema_id: string | null;
-  numero: number | null;
-  tema: string | null;
-  en_banco: number;
-  vistas: number;
-  dominadas: number;
-  pendientes: number;
-}
 
 const AVISOS: Record<string, string> = {
   "sin-preguntas": "No hay preguntas para ese test. Prueba con otro tema.",
@@ -24,7 +16,7 @@ const cuando = (f: string) => new Date(f).toLocaleDateString("es-ES", { day: "nu
 
 export default async function Estudiar({ searchParams }: PageProps<"/teoria/tests">) {
   await exigirRol("alumno");
-  const { aviso } = await searchParams;
+  const { aviso, tema } = await searchParams;
   const alumnoId = await miAlumnoId();
   const supabase = await createClient();
   const [{ data: temas, error }, { data: intentos }] = await Promise.all([
@@ -37,7 +29,6 @@ export default async function Estudiar({ searchParams }: PageProps<"/teoria/test
       .limit(15),
   ]);
   const filas = ((temas ?? []) as TemaAlumno[]).map((t) => ({ ...t, en_banco: Number(t.en_banco), vistas: Number(t.vistas), dominadas: Number(t.dominadas), pendientes: Number(t.pendientes) }));
-  const conTema = filas.filter((t) => t.tema_id);
   const enBanco = filas.reduce((a, t) => a + t.en_banco, 0);
   const pendientes = filas.reduce((a, t) => a + t.pendientes, 0);
   const dominadas = filas.reduce((a, t) => a + t.dominadas, 0);
@@ -82,10 +73,7 @@ export default async function Estudiar({ searchParams }: PageProps<"/teoria/test
                 <input type="hidden" name="tipo" value="practica" />
                 <label>
                   Tema
-                  <select name="tema" defaultValue="">
-                    <option value="">Todos los temas</option>
-                    {conTema.map((t) => <option key={t.tema_id} value={t.tema_id!}>{etiquetaTema(t.numero, t.tema!)} ({t.en_banco})</option>)}
-                  </select>
+                  <SelectorTema temas={filas} defaultValue={typeof tema === "string" ? tema : ""} contar />
                 </label>
                 <label>
                   Preguntas
@@ -102,6 +90,15 @@ export default async function Estudiar({ searchParams }: PageProps<"/teoria/test
               <p className="sub">Como el día del examen: con tiempo, la nota al final y los fallos restan.</p>
               <form action={empezarTest} className="campos">
                 <input type="hidden" name="tipo" value="simulacro" />
+                {filas.some((t) => t.comun) && (
+                  <label>
+                    De
+                    <select name="tema" defaultValue="">
+                      <option value="">Mi temario</option>
+                      <option value="comun">Psicotécnicos, ortografía…</option>
+                    </select>
+                  </label>
+                )}
                 <label>
                   Preguntas
                   <input name="cuantas" type="number" min={5} max={200} defaultValue={Math.min(100, Math.max(5, enBanco))} />
@@ -137,8 +134,8 @@ export default async function Estudiar({ searchParams }: PageProps<"/teoria/test
                   <thead><tr><th>Tema</th><th>Dominadas</th><th>Por repasar</th></tr></thead>
                   <tbody>
                     {filas.map((t) => (
-                      <tr key={t.tema_id ?? "sin"}>
-                        <td>{t.tema ? etiquetaTema(t.numero, t.tema) : "Sin tema"}</td>
+                      <tr key={t.tema_id ?? (t.comun ? "sin-comun" : "sin")}>
+                        <td>{t.tema ? etiquetaTema(t.numero, t.tema) : "Sin tema"}{t.comun && <span className="sub"> · común</span>}</td>
                         <td>
                           <span className="avance" style={{ "--avance": `${t.en_banco ? (100 * t.dominadas) / t.en_banco : 0}%` } as React.CSSProperties}>
                             {t.dominadas} de {t.en_banco}

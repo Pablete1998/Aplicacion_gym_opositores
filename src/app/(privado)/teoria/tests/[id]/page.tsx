@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { miAlumnoId, perfilActual } from "@/lib/datos";
+import { ImagenPregunta } from "@/components/ImagenPregunta";
 import { LETRAS } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { formatoNota, reloj, restaPorFallo, TIPOS, type TipoTest } from "@/lib/tests";
@@ -68,6 +69,7 @@ export default async function Intento({ params }: PageProps<"/teoria/tests/[id]"
                     {p.elegida === null ? "En blanco" : acertada ? "Acierto" : "Fallo"}
                   </span>
                 </div>
+                {p.imagen && <ImagenPregunta nombre={p.imagen} />}
                 <ul>
                   {p.opciones.map((o, i) => (
                     <li key={i} className={i === p.correcta ? "correcta" : i === p.elegida ? "elegida-mal" : undefined}>

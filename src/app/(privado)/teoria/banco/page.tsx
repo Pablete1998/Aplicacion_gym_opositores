@@ -1,8 +1,9 @@
 import Link from "next/link";
 import { exigirRol } from "@/lib/datos";
-import { etiquetaTema, LETRAS } from "@/lib/preguntas";
+import { COMUN, etiquetaTema, idOposicion, LETRAS, NOMBRE_COMUN } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { esUuid } from "@/lib/texto";
+import { ImagenPregunta } from "@/components/ImagenPregunta";
 import { NuevoTema, Tema } from "./Temas";
 
 const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
@@ -13,34 +14,31 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
   const sp = await searchParams;
   const supabase = await createClient();
 
-  const { data: oposiciones } = await supabase.from("oposiciones").select("id, nombre").eq("activa", true).order("nombre");
-  const oposicion = oposiciones?.find((o) => o.id === texto(sp.oposicion)) ?? oposiciones?.[0] ?? null;
+  const { data: activas } = await supabase.from("oposiciones").select("id, nombre").eq("activa", true).order("nombre");
+  const oposiciones = [...(activas ?? []), { id: COMUN, nombre: NOMBRE_COMUN }];
+  const oposicion = oposiciones.find((o) => o.id === texto(sp.oposicion)) ?? oposiciones[0];
+  const comun = oposicion.id === COMUN;
   const tema = texto(sp.tema); // "" = todos, "sin" = sin tema, o el id del tema
   const buscar = texto(sp.q).slice(0, 100);
 
-  const [{ data: temas, error }, { data: resumen }] = oposicion
-    ? await Promise.all([
-        supabase.from("temas").select("id, numero, nombre").eq("oposicion_id", oposicion.id).order("numero", { nullsFirst: false }).order("nombre"),
-        supabase.rpc("resumen_banco", { p_oposicion: oposicion.id }),
-      ])
-    : [{ data: null, error: null }, { data: null }];
+  const consultaTemas = supabase.from("temas").select("id, numero, nombre");
+  const [{ data: temas, error }, { data: resumen }] = await Promise.all([
+    (comun ? consultaTemas.is("oposicion_id", null) : consultaTemas.eq("oposicion_id", oposicion.id)).order("numero", { nullsFirst: false }).order("nombre"),
+    supabase.rpc("resumen_banco", { p_oposicion: idOposicion(oposicion.id) }),
+  ]);
   const cuenta = new Map(((resumen ?? []) as { tema_id: string | null; total: number }[]).map((r) => [r.tema_id ?? "sin", Number(r.total)]));
   const total = [...cuenta.values()].reduce((a, b) => a + b, 0);
 
-  let consulta = oposicion
-    ? supabase
-        .from("preguntas")
-        .select("id, tema_id, enunciado, opciones, correcta, explicacion, activa", { count: "exact" })
-        .eq("oposicion_id", oposicion.id)
-    : null;
-  if (consulta && tema === "sin") consulta = consulta.is("tema_id", null);
-  else if (consulta && esUuid(tema)) consulta = consulta.eq("tema_id", tema);
+  let consulta = supabase.from("preguntas").select("id, tema_id, enunciado, opciones, correcta, explicacion, activa, imagen", { count: "exact" });
+  consulta = comun ? consulta.is("oposicion_id", null) : consulta.eq("oposicion_id", oposicion.id);
+  if (tema === "sin") consulta = consulta.is("tema_id", null);
+  else if (esUuid(tema)) consulta = consulta.eq("tema_id", tema);
   // Las comas y paréntesis romperían el filtro de Supabase
-  if (consulta && buscar) consulta = consulta.ilike("enunciado", `%${buscar.replace(/[%_,()\\]/g, " ")}%`);
-  const { data: preguntas, count } = consulta ? await consulta.order("creado_en", { ascending: false }).limit(MOSTRAR) : { data: null, count: 0 };
+  if (buscar) consulta = consulta.ilike("enunciado", `%${buscar.replace(/[%_,()\\]/g, " ")}%`);
+  const { data: preguntas, count } = await consulta.order("creado_en", { ascending: false }).limit(MOSTRAR);
 
   const nombreTema = new Map((temas ?? []).map((t) => [t.id, etiquetaTema(t.numero, t.nombre)]));
-  const enlace = (p: Record<string, string>) => `/teoria/banco?${new URLSearchParams({ oposicion: oposicion?.id ?? "", ...p })}`;
+  const enlace = (p: Record<string, string>) => `/teoria/banco?${new URLSearchParams({ oposicion: oposicion.id, ...p })}`;
 
   return (
     <>
@@ -50,12 +48,10 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
           <h1>Banco de tests</h1>
           <p className="sub">Las preguntas tipo test de cada oposición, ordenadas por temas. Con ellas practicarán los alumnos.</p>
         </div>
-        {oposicion && (
-          <div className="row">
-            <Link className="btn ghost" href={`/teoria/banco/importar?oposicion=${oposicion.id}`}>Pegar desde Excel</Link>
-            <Link className="btn" href={`/teoria/banco/pregunta?${new URLSearchParams({ oposicion: oposicion.id, tema: esUuid(tema) ? tema : "" })}`}>Nueva pregunta</Link>
-          </div>
-        )}
+        <div className="row">
+          <Link className="btn ghost" href={`/teoria/banco/importar?oposicion=${oposicion.id}`}>Pegar desde Excel</Link>
+          <Link className="btn" href={`/teoria/banco/pregunta?${new URLSearchParams({ oposicion: oposicion.id, tema: esUuid(tema) ? tema : "" })}`}>Nueva pregunta</Link>
+        </div>
       </div>
 
       {error && <p className="aviso error">Falta ejecutar la migración 0011_banco_tests.sql en Supabase.</p>}
@@ -68,8 +64,8 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
           </label>
           <label>
             Oposición
-            <select name="oposicion" defaultValue={oposicion?.id}>
-              {(oposiciones ?? []).map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+            <select name="oposicion" defaultValue={oposicion.id}>
+              {oposiciones.map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
             </select>
           </label>
           <label>
@@ -84,10 +80,9 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
         </form>
       </section>
 
-      {oposicion && (
         <div className="grid2">
           <section className="panel">
-            <h2>Temas de {oposicion.nombre}</h2>
+            <h2>{comun ? "Temas comunes" : `Temas de ${oposicion.nombre}`}</h2>
             <p className="sub">{total} {total === 1 ? "pregunta" : "preguntas"} en total.</p>
             {(temas ?? []).map((t) => (
               <Tema key={t.id} id={t.id} numero={t.numero} nombre={t.nombre} etiqueta={nombreTema.get(t.id)!} preguntas={cuenta.get(t.id) ?? 0} href={enlace({ tema: t.id })} />
@@ -119,6 +114,7 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
                         </li>
                       ))}
                     </ul>
+                    {p.imagen && <ImagenPregunta nombre={p.imagen} />}
                     {p.explicacion && <p className="sub">{p.explicacion}</p>}
                     {!tema && p.tema_id && <p className="sub">{nombreTema.get(p.tema_id)}</p>}
                     {!p.activa && <p className="sub">Retirada: los alumnos no la verán.</p>}
@@ -132,7 +128,6 @@ export default async function BancoTests({ searchParams }: PageProps<"/teoria/ba
             )}
           </section>
         </div>
-      )}
     </>
   );
 }

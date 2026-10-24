@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { exigirRol } from "@/lib/datos";
+import { COMUN, NOMBRE_COMUN } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { Importador } from "./Importador";
 
@@ -9,13 +10,14 @@ export default async function Importar({ searchParams }: PageProps<"/teoria/banc
   await exigirRol("direccion", "preparador");
   const sp = await searchParams;
   const supabase = await createClient();
-  const { data: oposiciones } = await supabase.from("oposiciones").select("id, nombre").eq("activa", true).order("nombre");
-  const oposicion = oposiciones?.find((o) => o.id === texto(sp.oposicion)) ?? oposiciones?.[0] ?? null;
+  const { data: activas } = await supabase.from("oposiciones").select("id, nombre").eq("activa", true).order("nombre");
+  const oposiciones = [...(activas ?? []), { id: COMUN, nombre: NOMBRE_COMUN }];
+  const oposicion = oposiciones.find((o) => o.id === texto(sp.oposicion)) ?? oposiciones[0];
 
   return (
     <>
       <div>
-        <p className="sub"><Link href={`/teoria/banco?oposicion=${oposicion?.id ?? ""}`}>← Banco de tests</Link></p>
+        <p className="sub"><Link href={`/teoria/banco?oposicion=${oposicion.id}`}>← Banco de tests</Link></p>
         <h1>Pegar preguntas desde Excel</h1>
         <p className="sub">
           Pon en Excel una pregunta por fila con estas columnas: <b>Tema · Pregunta · A · B · C · D · Correcta · Explicación</b>.
@@ -30,13 +32,13 @@ export default async function Importar({ searchParams }: PageProps<"/teoria/banc
         <form className="campos" action="/teoria/banco/importar">
           <label>
             Oposición
-            <select name="oposicion" defaultValue={oposicion?.id}>
-              {(oposiciones ?? []).map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
+            <select name="oposicion" defaultValue={oposicion.id}>
+              {oposiciones.map((o) => <option key={o.id} value={o.id}>{o.nombre}</option>)}
             </select>
           </label>
           <button className="btn ghost">Cambiar</button>
         </form>
-        {oposicion && <Importador key={oposicion.id} oposicionId={oposicion.id} oposicion={oposicion.nombre} />}
+        <Importador key={oposicion.id} oposicionId={oposicion.id} oposicion={oposicion.nombre} />
       </section>
     </>
   );
