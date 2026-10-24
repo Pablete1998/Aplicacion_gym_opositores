@@ -43,7 +43,11 @@ export default async function Teoria() {
         href: "/teoria/tests?tema=comun",
       },
       { titulo: "Plan de estudio", texto: "Qué te toca cada día hasta el examen." },
-      { titulo: "Temario y BOE", texto: "Los temas de tu oposición y avisos cuando cambie una ley." },
+      {
+        titulo: "Temario",
+        texto: "Apuntes y esquemas de cada tema de tu oposición, sacados de las leyes vigentes del BOE.",
+        href: "/teoria/temario",
+      },
     ];
   } else {
     const { count } = await supabase.from("preguntas").select("id", { count: "exact", head: true });
@@ -53,6 +57,11 @@ export default async function Teoria() {
         texto: "Las preguntas tipo test de cada oposición por temas. Escríbelas una a una o pégalas desde Excel.",
         href: "/teoria/banco",
         dato: count ? `${count} preguntas` : undefined,
+      },
+      {
+        titulo: "Temario",
+        texto: "Apuntes y esquemas de cada tema según la última convocatoria. Revísalos aquí antes de que los vean los alumnos.",
+        href: "/teoria/temario",
       },
       {
         titulo: "Resultados de los alumnos",

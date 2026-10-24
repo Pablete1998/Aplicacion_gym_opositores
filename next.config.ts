@@ -33,6 +33,8 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Las imágenes de las preguntas llegan por un Server Action (hasta 2 MB más el formulario)
   experimental: { serverActions: { bodySizeLimit: "3mb" } },
+  // El temario se lee de contenido/temario al pedir la página: hay que llevarlo al servidor
+  outputFileTracingIncludes: { "/teoria/**": ["./contenido/temario/**/*"] },
   async headers() {
     return [{ source: "/(.*)", headers: CABECERAS }];
   },
