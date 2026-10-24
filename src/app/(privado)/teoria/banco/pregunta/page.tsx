@@ -9,7 +9,7 @@ import { FormularioPregunta } from "../FormularioPregunta";
 const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 
 // Nueva pregunta (?oposicion=…&tema=…) o edición de una existente (?id=…)
-export default async function Pregunta({ searchParams }: PageProps<"/tests/pregunta">) {
+export default async function Pregunta({ searchParams }: PageProps<"/teoria/banco/pregunta">) {
   await exigirRol("direccion", "preparador");
   const sp = await searchParams;
   const supabase = await createClient();
@@ -33,7 +33,7 @@ export default async function Pregunta({ searchParams }: PageProps<"/tests/pregu
   return (
     <>
       <div>
-        <p className="sub"><Link href={`/tests?${new URLSearchParams({ oposicion: oposicionId, tema: temaId })}`}>← Banco de tests</Link></p>
+        <p className="sub"><Link href={`/teoria/banco?${new URLSearchParams({ oposicion: oposicionId, tema: temaId })}`}>← Banco de tests</Link></p>
         <h1>{pregunta ? "Editar pregunta" : "Nueva pregunta"}</h1>
         <p className="sub">{oposicion.nombre}</p>
       </div>

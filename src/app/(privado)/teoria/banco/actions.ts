@@ -28,7 +28,7 @@ export async function guardarTema(_prev: Respuesta, form: FormData): Promise<Res
     ? await supabase.from("temas").update({ nombre, numero }).eq("id", id)
     : await supabase.from("temas").insert({ oposicion_id: oposicionId, nombre, numero });
   if (error) return { ok: false, mensaje: error.code === "23505" ? "Ya hay un tema con ese nombre." : "No se pudo guardar." };
-  revalidatePath("/tests");
+  revalidatePath("/teoria/banco");
   return { ok: true, mensaje: id ? "Guardado." : "Tema añadido." };
 }
 
@@ -39,7 +39,7 @@ export async function borrarTema(form: FormData) {
   if (!esUuid(id)) return;
   const supabase = await createClient();
   await supabase.from("temas").delete().eq("id", id);
-  revalidatePath("/tests");
+  revalidatePath("/teoria/banco");
 }
 
 export async function guardarPregunta(_prev: RespuestaPregunta, form: FormData): Promise<RespuestaPregunta> {
@@ -65,7 +65,7 @@ export async function guardarPregunta(_prev: RespuestaPregunta, form: FormData):
     ? await supabase.from("preguntas").update({ ...fila, activa: valores.activa === "on" }).eq("id", id)
     : await supabase.from("preguntas").insert({ ...fila, oposicion_id });
   if (error) return fallo("No se pudo guardar. Inténtalo de nuevo.");
-  revalidatePath("/tests");
+  revalidatePath("/teoria/banco");
   // Tras una nueva, el formulario queda limpio y en el mismo tema para escribir la siguiente
   return id
     ? { ok: true, mensaje: "Guardada.", n, valores }
@@ -79,9 +79,9 @@ export async function borrarPregunta(form: FormData) {
   if (esUuid(id)) {
     const supabase = await createClient();
     await supabase.from("preguntas").delete().eq("id", id);
-    revalidatePath("/tests");
+    revalidatePath("/teoria/banco");
   }
-  redirect(`/tests?${volver}`);
+  redirect(`/teoria/banco?${volver}`);
 }
 
 // Pegado desde Excel o CSV: crea los temas que falten y salta las preguntas que ya estén en el banco
@@ -140,7 +140,7 @@ export async function importarPreguntas(oposicionId: string, contenido: string):
     );
     if (error) return { ok: false, mensaje: `Se importaron ${i} preguntas y luego falló. Vuelve a pegar lo mismo: las ya importadas se saltan.` };
   }
-  revalidatePath("/tests");
+  revalidatePath("/teoria/banco");
 
   const partes = [`${aInsertar.length} ${aInsertar.length === 1 ? "pregunta importada" : "preguntas importadas"}`];
   if (nuevos.length) partes.push(`${nuevos.length} ${nuevos.length === 1 ? "tema nuevo" : "temas nuevos"}`);

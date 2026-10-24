@@ -8,7 +8,7 @@ import { NuevoTema, Tema } from "./Temas";
 const texto = (v: string | string[] | undefined) => (typeof v === "string" ? v : "");
 const MOSTRAR = 100;
 
-export default async function BancoTests({ searchParams }: PageProps<"/tests">) {
+export default async function BancoTests({ searchParams }: PageProps<"/teoria/banco">) {
   await exigirRol("direccion", "preparador");
   const sp = await searchParams;
   const supabase = await createClient();
@@ -40,19 +40,20 @@ export default async function BancoTests({ searchParams }: PageProps<"/tests">) 
   const { data: preguntas, count } = consulta ? await consulta.order("creado_en", { ascending: false }).limit(MOSTRAR) : { data: null, count: 0 };
 
   const nombreTema = new Map((temas ?? []).map((t) => [t.id, etiquetaTema(t.numero, t.nombre)]));
-  const enlace = (p: Record<string, string>) => `/tests?${new URLSearchParams({ oposicion: oposicion?.id ?? "", ...p })}`;
+  const enlace = (p: Record<string, string>) => `/teoria/banco?${new URLSearchParams({ oposicion: oposicion?.id ?? "", ...p })}`;
 
   return (
     <>
       <div className="row">
         <div>
+          <p className="sub"><Link href="/teoria">← Teoría</Link></p>
           <h1>Banco de tests</h1>
           <p className="sub">Las preguntas tipo test de cada oposición, ordenadas por temas. Con ellas practicarán los alumnos.</p>
         </div>
         {oposicion && (
           <div className="row">
-            <Link className="btn ghost" href={`/tests/importar?oposicion=${oposicion.id}`}>Pegar desde Excel</Link>
-            <Link className="btn" href={`/tests/pregunta?${new URLSearchParams({ oposicion: oposicion.id, tema: esUuid(tema) ? tema : "" })}`}>Nueva pregunta</Link>
+            <Link className="btn ghost" href={`/teoria/banco/importar?oposicion=${oposicion.id}`}>Pegar desde Excel</Link>
+            <Link className="btn" href={`/teoria/banco/pregunta?${new URLSearchParams({ oposicion: oposicion.id, tema: esUuid(tema) ? tema : "" })}`}>Nueva pregunta</Link>
           </div>
         )}
       </div>
@@ -60,7 +61,7 @@ export default async function BancoTests({ searchParams }: PageProps<"/tests">) 
       {error && <p className="aviso error">Falta ejecutar la migración 0011_banco_tests.sql en Supabase.</p>}
 
       <section className="panel">
-        <form className="filtros" action="/tests">
+        <form className="filtros" action="/teoria/banco">
           <label>
             Buscar en las preguntas
             <input name="q" defaultValue={buscar} placeholder="Ej. Constitución" />
@@ -109,7 +110,7 @@ export default async function BancoTests({ searchParams }: PageProps<"/tests">) 
                   <li key={p.id} className={p.activa ? undefined : "apagada"}>
                     <div className="row">
                       <strong>{p.enunciado}</strong>
-                      <Link href={`/tests/pregunta?id=${p.id}`}>Editar</Link>
+                      <Link href={`/teoria/banco/pregunta?id=${p.id}`}>Editar</Link>
                     </div>
                     <ul>
                       {(p.opciones as string[]).map((o, i) => (
