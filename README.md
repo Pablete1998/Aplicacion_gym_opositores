@@ -18,6 +18,8 @@ Fase 1: seguimiento de pruebas físicas y teóricas, evolución de cada alumno f
 | `/mi` | Alumno | Su evolución, su QR de acceso y sus facturas |
 | `/rankings` | Todos menos recepción | La mejor marca de cada alumno en cada prueba, de toda la academia o por oposición, mujeres y hombres por separado, con el mote de cada uno si tiene |
 | `/facturas` | Dirección | Facturas de las cuotas (salen solas al marcar una cuota pagada), rectificativas, datos fiscales y CSV para el gestor por mes o trimestre |
+| `/tests` | Dirección, preparadores | Banco de preguntas tipo test por oposición y tema: alta una a una, edición, retirar o borrar |
+| `/tests/importar` | Dirección, preparadores | Pegar preguntas copiadas de Excel (o subir un CSV); crea los temas que falten y salta las repetidas |
 | `/facturas/[id]` | Dirección, el alumno | Factura para imprimir o guardar en PDF |
 
 Las oposiciones son datos: cada una tiene sus pruebas (unidad y si más es mejor) y sus baremos (mínimo y objetivo, por sexo y edad).
@@ -29,7 +31,7 @@ dirección ve todo, el preparador solo sus grupos, el alumno solo lo suyo y rece
 ## Puesta en marcha
 
 1. Crea un proyecto en [Supabase](https://supabase.com) en una región de la UE.
-2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql`, `supabase/migrations/0007_testigo.sql`, `supabase/migrations/0008_facturas.sql` y `supabase/migrations/0009_rankings.sql`.
+2. En el editor SQL, ejecuta en orden `supabase/migrations/0001_esquema.sql`, `supabase/seed.sql`, `supabase/migrations/0002_personal.sql`, `supabase/migrations/0003_baremos_oficiales.sql`, `supabase/migrations/0004_ranking_y_toques.sql`, `supabase/migrations/0005_pagos.sql`, `supabase/migrations/0006_sesiones.sql`, `supabase/migrations/0007_testigo.sql`, `supabase/migrations/0008_facturas.sql`, `supabase/migrations/0009_rankings.sql`, `supabase/migrations/0010_seguridad.sql` y `supabase/migrations/0011_banco_tests.sql`.
 3. Copia `.env.example` a `.env.local` y rellena la URL, la clave pública y la clave secreta del proyecto.
    La clave secreta (`SUPABASE_SECRET_KEY`) solo se usa en el servidor para crear accesos; en Vercel va como tipo Secret.
 4. `npm install` y `npm run dev`.
@@ -52,4 +54,4 @@ npm run build
 - Avisos a grupos (la tabla y los permisos ya existen).
 - Lectura del QR con la cámara de la tablet (hoy funciona con lector USB/Bluetooth o pegando el código).
 - Tipos generados con `supabase gen types` en lugar del ayudante `uno()`.
-- Fase 2: banco de test, temario basado en el BOE y vídeos.
+- Fase 2: que los alumnos hagan tests (simulacros con tiempo, repaso de fallos, repaso espaciado), temario basado en el BOE.
