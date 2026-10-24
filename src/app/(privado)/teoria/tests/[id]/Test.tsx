@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { ImagenPregunta } from "@/components/ImagenPregunta";
 import { LETRAS } from "@/lib/preguntas";
 import { reloj, TIPOS, type TipoTest } from "@/lib/tests";
 import { responder, terminarTest } from "../actions";
@@ -11,6 +12,7 @@ export interface PreguntaTest {
   tema: string | null;
   enunciado: string;
   opciones: string[];
+  imagen?: string | null; // sin la migración 0014 no llega
   elegida: number | null;
   correcta: number | null;
   explicacion: string | null;
@@ -105,6 +107,7 @@ export function Test({ intentoId, tipo, limite, preguntas }: { intentoId: string
 
       <section className="panel">
         <p className="enunciado">{p.enunciado}</p>
+        {p.imagen && <ImagenPregunta nombre={p.imagen} />}
         <div className="opciones-test">
           {p.opciones.map((o, i) => (
             <button key={i} type="button" className={clase(i)} onClick={() => elegir(i)} aria-pressed={i === elegida} disabled={terminando}>

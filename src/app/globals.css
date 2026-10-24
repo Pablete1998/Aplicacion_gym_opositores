@@ -397,3 +397,4 @@ ol.revision li.elegida-mal { color: var(--bad); }
 .notas-repaso .nota-2 { border-color: var(--warn); }
 .notas-repaso .nota-3 { border-color: var(--ok); }
 .notas-repaso .nota-4 { border-color: #6aa8ff; }
+.imagen-pregunta { max-width: 100%; max-height: 360px; border-radius: 8px; background: #fff; justify-self: start; }

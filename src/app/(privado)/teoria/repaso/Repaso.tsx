@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { ImagenPregunta } from "@/components/ImagenPregunta";
 import { LETRAS } from "@/lib/preguntas";
 import { cuandoVuelve, NOTAS, programar, type EstadoTarjeta, type Nota } from "@/lib/repaso";
 import { valorar } from "./actions";
@@ -11,6 +12,7 @@ export interface TarjetaHoy extends EstadoTarjeta {
   tema: string | null;
   enunciado: string;
   opciones: string[];
+  imagen?: string | null; // sin la migración 0014 no llega
   correcta: number;
   explicacion: string | null;
   nueva: boolean;
@@ -65,6 +67,7 @@ export function Repaso({ tarjetas, masNuevas }: { tarjetas: TarjetaHoy[]; masNue
       <section className="panel tarjeta">
         {t.tema && <p className="sub">{t.tema}</p>}
         <p className="enunciado">{t.enunciado}</p>
+        {t.imagen && <ImagenPregunta nombre={t.imagen} />}
         <div className="opciones-test">
           {t.opciones.map((o, i) => {
             const clase = !girada ? (i === elegida ? "elegida" : "") : i === t.correcta ? "bien" : i === elegida ? "mal" : "";

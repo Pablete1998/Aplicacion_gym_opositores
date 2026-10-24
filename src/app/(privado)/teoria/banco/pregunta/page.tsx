@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
-import { etiquetaTema } from "@/lib/preguntas";
+import { COMUN, etiquetaTema, NOMBRE_COMUN } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { esUuid } from "@/lib/texto";
 import { FormularioPregunta } from "../FormularioPregunta";
@@ -16,15 +16,17 @@ export default async function Pregunta({ searchParams }: PageProps<"/teoria/banc
 
   const id = texto(sp.id);
   const { data: pregunta } = esUuid(id)
-    ? await supabase.from("preguntas").select("id, oposicion_id, tema_id, enunciado, opciones, correcta, explicacion, activa").eq("id", id).maybeSingle()
+    ? await supabase.from("preguntas").select("id, oposicion_id, tema_id, enunciado, opciones, correcta, explicacion, activa, imagen").eq("id", id).maybeSingle()
     : { data: null };
   if (id && !pregunta) notFound();
-  const oposicionId = pregunta?.oposicion_id ?? texto(sp.oposicion);
-  if (!esUuid(oposicionId)) notFound();
+  const oposicionId = pregunta ? (pregunta.oposicion_id ?? COMUN) : texto(sp.oposicion);
+  const comun = oposicionId === COMUN;
+  if (!comun && !esUuid(oposicionId)) notFound();
 
+  const consultaTemas = supabase.from("temas").select("id, numero, nombre");
   const [{ data: oposicion }, { data: temas }] = await Promise.all([
-    supabase.from("oposiciones").select("id, nombre").eq("id", oposicionId).maybeSingle(),
-    supabase.from("temas").select("id, numero, nombre").eq("oposicion_id", oposicionId).order("numero", { nullsFirst: false }).order("nombre"),
+    comun ? { data: { id: COMUN, nombre: NOMBRE_COMUN } } : supabase.from("oposiciones").select("id, nombre").eq("id", oposicionId).maybeSingle(),
+    (comun ? consultaTemas.is("oposicion_id", null) : consultaTemas.eq("oposicion_id", oposicionId)).order("numero", { nullsFirst: false }).order("nombre"),
   ]);
   if (!oposicion) notFound();
   const opciones = (pregunta?.opciones as string[] | undefined) ?? [];
@@ -53,6 +55,7 @@ export default async function Pregunta({ searchParams }: PageProps<"/teoria/banc
             explicacion: pregunta?.explicacion ?? "",
             activa: pregunta && !pregunta.activa ? "" : "on",
           }}
+          imagen={pregunta?.imagen ?? null}
         />
       </section>
     </>

@@ -94,3 +94,12 @@ export function leerImportacion(texto: string): { filas: FilaImportada[]; errore
 // «3. La Constitución», salvo que el nombre ya lleve el número («Tema 3…», «3 - …»)
 export const etiquetaTema = (numero: number | null, nombre: string) =>
   numero !== null && numeroTema(nombre) === null ? `${numero}. ${nombre}` : nombre;
+
+// El banco común (psicotécnicos, ortografía…) no tiene oposición: en enlaces y formularios va como «comun»
+export const COMUN = "comun";
+export const NOMBRE_COMUN = "Común a todas (psicotécnicos, ortografía…)";
+export const idOposicion = (valor: string) => (valor === COMUN ? null : valor);
+
+// Imágenes de las preguntas: nombre en el almacén y dirección desde la que la app las sirve
+export const esNombreImagen = (nombre: string) => /^[0-9a-f-]{36}\.(png|jpg|webp|gif)$/.test(nombre);
+export const urlImagen = (nombre: string) => `/teoria/imagen/${nombre}`;

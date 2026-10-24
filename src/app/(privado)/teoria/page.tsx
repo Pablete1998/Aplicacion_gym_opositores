@@ -37,8 +37,11 @@ export default async function Teoria() {
         href: "/teoria/repaso",
         dato: paraHoy ? `${paraHoy} para hoy` : "Al día",
       },
-      { titulo: "Psicotécnicos", texto: "Series, razonamiento y aptitudes con tiempo." },
-      { titulo: "Ortografía", texto: "Las reglas y palabras que más caen." },
+      {
+        titulo: "Psicotécnicos y ortografía",
+        texto: "Series, razonamiento, aptitudes y ortografía: comunes a todas las oposiciones.",
+        href: "/teoria/tests?tema=comun",
+      },
       { titulo: "Plan de estudio", texto: "Qué te toca cada día hasta el examen." },
       { titulo: "Temario y BOE", texto: "Los temas de tu oposición y avisos cuando cambie una ley." },
     ];
@@ -56,7 +59,11 @@ export default async function Teoria() {
         texto: "Los tests de cada alumno, con su nota, están en su ficha. El repaso diario tipo Anki lo hacen con las preguntas del banco.",
         href: "/alumnos",
       },
-      { titulo: "Psicotécnicos y ortografía", texto: "Bancos propios para estas pruebas." },
+      {
+        titulo: "Psicotécnicos y ortografía",
+        texto: "Un banco común a todas las oposiciones, con imágenes para las series de figuras.",
+        href: "/teoria/banco?oposicion=comun",
+      },
       { titulo: "Plan de estudio y nota estimada", texto: "Qué toca cada día y cómo va cada alumno frente al examen." },
       { titulo: "Avisos del BOE", texto: "Aviso cuando salga una convocatoria o cambie una ley del temario." },
     ];

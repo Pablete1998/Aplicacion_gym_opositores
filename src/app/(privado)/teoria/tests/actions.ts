@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { exigirRol } from "@/lib/datos";
+import { COMUN } from "@/lib/preguntas";
 import { createClient } from "@/lib/supabase/server";
 import { esUuid } from "@/lib/texto";
 
@@ -17,6 +18,8 @@ export async function empezarTest(form: FormData) {
     p_tema: esUuid(tema) ? tema : null,
     p_cuantas: Number(texto(form, "cuantas")) || 10,
     p_minutos: Number(texto(form, "minutos")) || null,
+    // Solo se manda cuando hace falta, para que funcione aunque no esté ejecutada la migración 0014
+    ...(tema === COMUN ? { p_comun: true } : {}),
   });
   if (error || !data) redirect(`/teoria/tests?aviso=${error?.message.includes("No hay preguntas") ? "sin-preguntas" : "error"}`);
   redirect(`/teoria/tests/${data}`);

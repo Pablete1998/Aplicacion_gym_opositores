@@ -31,6 +31,8 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   poweredByHeader: false,
+  // Las imágenes de las preguntas llegan por un Server Action (hasta 2 MB más el formulario)
+  experimental: { serverActions: { bodySizeLimit: "3mb" } },
   async headers() {
     return [{ source: "/(.*)", headers: CABECERAS }];
   },
