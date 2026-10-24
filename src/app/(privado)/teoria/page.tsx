@@ -16,7 +16,11 @@ export default async function Teoria() {
   let ramas: Rama[];
 
   if (perfil.rol === "alumno") {
-    const { data } = await supabase.rpc("mis_temas");
+    const [{ data }, { data: hoy }] = await Promise.all([
+      supabase.rpc("mis_temas"),
+      supabase.rpc("repaso_de_hoy", { p_nuevas: 20, p_tema: null }),
+    ]);
+    const paraHoy = (hoy ?? []).length;
     const temas = (data ?? []) as { en_banco: number; pendientes: number }[];
     const enBanco = temas.reduce((a, t) => a + Number(t.en_banco), 0);
     const pendientes = temas.reduce((a, t) => a + Number(t.pendientes), 0);
@@ -27,7 +31,12 @@ export default async function Teoria() {
         href: "/teoria/tests",
         dato: enBanco ? `${enBanco} preguntas${pendientes ? ` · ${pendientes} por repasar` : ""}` : undefined,
       },
-      { titulo: "Repaso diario", texto: "Tarjetas que vuelven justo antes de que se te olviden, como Anki." },
+      {
+        titulo: "Repaso diario",
+        texto: "Tarjetas que vuelven justo antes de que se te olviden, como en Anki. Un rato cada día.",
+        href: "/teoria/repaso",
+        dato: paraHoy ? `${paraHoy} para hoy` : "Al día",
+      },
       { titulo: "Psicotécnicos", texto: "Series, razonamiento y aptitudes con tiempo." },
       { titulo: "Ortografía", texto: "Las reglas y palabras que más caen." },
       { titulo: "Plan de estudio", texto: "Qué te toca cada día hasta el examen." },
@@ -44,10 +53,9 @@ export default async function Teoria() {
       },
       {
         titulo: "Resultados de los alumnos",
-        texto: "Los tests de cada alumno, con su nota, están en su ficha.",
+        texto: "Los tests de cada alumno, con su nota, están en su ficha. El repaso diario tipo Anki lo hacen con las preguntas del banco.",
         href: "/alumnos",
       },
-      { titulo: "Repaso diario", texto: "Repetición espaciada tipo Anki con las preguntas del banco." },
       { titulo: "Psicotécnicos y ortografía", texto: "Bancos propios para estas pruebas." },
       { titulo: "Plan de estudio y nota estimada", texto: "Qué toca cada día y cómo va cada alumno frente al examen." },
       { titulo: "Avisos del BOE", texto: "Aviso cuando salga una convocatoria o cambie una ley del temario." },
